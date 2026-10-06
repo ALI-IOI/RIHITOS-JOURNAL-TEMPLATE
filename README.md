@@ -7,6 +7,10 @@ It ships with a demo learner ("IOI") and a 24-month roadmap whose dates are coun
 first open it, so the template never goes out of date. Replace the demo with your own plan from the
 **Console** page, or by editing one data file.
 
+**New here? Read [INSTRUCTIONS.md](INSTRUCTIONS.md)**: a step-by-step guide from copying the template to syncing your phone.
+
+**Live demo:** https://ali-ioi.github.io/RIHITOS-JOURNAL-TEMPLATE/
+
 ## What's inside
 
 - **Home** – a greeting and a deck of cards, one per section; scroll or swipe to browse.
@@ -20,11 +24,13 @@ first open it, so the template never goes out of date. Replace the demo with you
   and shopping list, and the next step after the roadmap.
 - **Console** – edit your profile, dates, daily targets, roadmap items; back up, import, reset; sync.
 
-## Use it
+## Use it (short version)
 
 1. Click **Use this template** on GitHub (or download the ZIP).
-2. Open `index.html` in a browser. That's it.
-3. To publish it: **Settings → Pages → Deploy from a branch → `main` / root**.
+2. Open `index.html` in a browser, or publish it: **Settings → Pages → Deploy from a branch → `main` / root**.
+3. Open **Console** in the app and put in your own name, dates and plan.
+
+Full walkthrough: [INSTRUCTIONS.md](INSTRUCTIONS.md).
 
 Your progress is saved in your browser. To see it on several devices, connect a private Gist
 (`docs/SYNC.md`). To change content, see `docs/CUSTOMIZE.md`.
