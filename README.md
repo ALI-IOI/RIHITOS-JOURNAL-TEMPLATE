@@ -3,9 +3,9 @@
 A personal learning tracker for anyone teaching themselves robotics, from a first circuit to robots
 that map rooms and fly missions. Plain HTML, CSS and JavaScript: no build step, no server, no account.
 
-It ships with a demo learner ("IOI") and a 24-month roadmap whose dates are counted from the day you
-first open it, so the template never goes out of date. Replace the demo with your own plan from the
-**Console** page, or by editing one data file.
+It ships with a demo learner ("IOI") and a 24-month roadmap. Press **Start your journey** on the home page and
+answer six steps; the journal rebuilds the whole plan around you. You can still edit any detail in the **Console**
+or in one data file.
 
 **New here? Read [INSTRUCTIONS.md](INSTRUCTIONS.md)**: a step-by-step guide from copying the template to syncing your phone.
 
@@ -13,6 +13,7 @@ first open it, so the template never goes out of date. Replace the demo with you
 
 ## What's inside
 
+- **Start your journey** – six short questions (you, timeline, level, focus and goal, time, tools). The site then rebuilds itself around your answers: phases, every project date, scholarship and exam deadlines with official sources, countdowns, daily plan and parts list.
 - **Home** – a greeting and a deck of cards, one per section; scroll or swipe to browse.
 - **Mission** – phases, gates, countdowns, deadlines and a build log.
 - **Tracker / Board** – every roadmap item with status, spaced-review state and notes.
@@ -28,7 +29,7 @@ first open it, so the template never goes out of date. Replace the demo with you
 
 1. Click **Use this template** on GitHub (or download the ZIP).
 2. Open `index.html` in a browser, or publish it: **Settings → Pages → Deploy from a branch → `main` / root**.
-3. Open **Console** in the app and put in your own name, dates and plan.
+3. Click the first card, **Start your journey**, answer six steps and press **Build my journal**. Fine-tune anything later in **Console**.
 
 Full walkthrough: [INSTRUCTIONS.md](INSTRUCTIONS.md).
 

@@ -1,6 +1,11 @@
 # Customising your journal
 
-There are two ways to make it yours. Use whichever suits you; they work together.
+There are three ways to make it yours. They work together.
+
+## 0. Start your journey (recommended first)
+
+Click the first card on the home page and answer six steps. It writes a full set of Console edits for you
+(phases, item dates, deadlines, countdowns, daily plan, parts). See `INSTRUCTIONS.md`, step 3.
 
 ## 1. The Console page (no code)
 
@@ -35,6 +40,7 @@ Everything the app shows comes from this one file of plain JavaScript constants:
 | `PCATS`, `INV0`, `BUY0` | Parts inventory and shopping list (first-run defaults) |
 | `CREDS`, `DOMAINS`, `SKILLS`, `COMM` | Credentials, Skills and Community pages |
 | `PLAN`, `PORT`, `APPLY`, `DECK` | Plan, Portfolio and Apply pages, and the home cards |
+| `WIZARD` | The *Start your journey* questions: country routes with official application windows and source links, tests, focus variants, owned-parts mapping. Remove it to hide the setup page |
 
 Rules that keep it working:
 

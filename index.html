@@ -131,6 +131,19 @@
     <div class="table-wrap glass"><table><thead><tr><th>ID</th><th>Item</th><th>Track</th><th>Target</th><th>Status</th><th>Review</th></tr></thead><tbody id="tbody"></tbody></table></div>
   </section>
 
+  <section class="view" id="view-start" hidden>
+    <div class="view-head"><div class="eyebrow">Start your journey · 6 short steps</div><h1>Start</h1><p>Answer a few questions about you, your timeline and where you want to go. The journal then rebuilds itself around you: phases, deadlines, exams, countdowns, your daily plan and your parts list.</p></div>
+    <div class="wz glass" id="wz">
+      <ol class="wz-steps" id="wz-steps" aria-label="Steps"></ol>
+      <form class="wz-body" id="wz-form" novalidate></form>
+      <div class="wz-nav">
+        <button type="button" class="btn-ghost" id="wz-back">← Back</button>
+        <span class="wz-err" id="wz-err" role="alert"></span>
+        <button type="button" class="btn-pill" id="wz-next">Next →</button>
+      </div>
+    </div>
+    <div class="wz-build glass" id="wz-build" hidden><h2>Building your journal</h2><ul id="wz-log"></ul></div>
+  </section>
   <section class="view" id="view-daily" hidden>
     <div class="view-head"><div class="eyebrow">Daily log · time blocks</div><h1>Daily</h1><p>Tick each block you actually worked. Squares fill with the activity's colour, the table on the right turns the day into a score, and the graph paper joins the dots.</p></div>
     <div class="dl-bar glass">
@@ -181,7 +194,7 @@
         <p class="cs-status" id="cs-gstat"></p></div>
       <div class="cs-card glass" id="cs-data"><h2>Backup</h2><p class="cs-note">Everything (progress, notes, parts, daily log, console edits) as one JSON file.</p>
         <div class="cs-act"><button class="btn-ghost" type="button" id="cs-export">Export JSON</button><label class="btn-ghost cs-file">Import JSON<input type="file" id="cs-import" accept="application/json,.json" hidden></label></div>
-        <h3>Reset</h3><p class="cs-note">Removes console edits only, back to the data files. Progress is kept.</p><div class="cs-act"><button class="btn-ghost danger" type="button" id="cs-reset">Reset console edits</button></div>
+        <div class="cs-act" id="cs-wizbox" style="justify-content:flex-start"><button class="btn-ghost" type="button" data-go="start">Run “Start your journey” again</button></div><h3>Reset</h3><p class="cs-note">Removes console edits only, back to the data files. Progress is kept.</p><div class="cs-act"><button class="btn-ghost danger" type="button" id="cs-reset">Reset console edits</button></div>
         <p class="cs-status" id="cs-dstat"></p></div>
       <form class="cs-card glass cs-wide" id="cs-raw"><h2>Raw edits (advanced)</h2><p class="cs-note">The JSON the console writes. Keys: <code>profile</code>, <code>text</code>, <code>countdowns</code>, <code>hard</code>, <code>daily</code>, <code>phases</code>, <code>items</code> (an item set to <code>null</code> is deleted).</p><textarea id="cs-rawtxt" spellcheck="false" rows="12"></textarea><div class="cs-act"><button class="btn-pill" type="submit">Apply JSON</button></div></form>
     </div>

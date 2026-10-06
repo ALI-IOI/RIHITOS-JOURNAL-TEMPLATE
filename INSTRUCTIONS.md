@@ -1,6 +1,6 @@
 # How to use Rihito's Journal
 
-A step-by-step guide for making this tracker your own. No coding needed for steps 1–5.
+A step-by-step guide for making this tracker your own. No coding needed for steps 1–7.
 
 **Live demo:** https://ali-ioi.github.io/RIHITOS-JOURNAL-TEMPLATE/
 
@@ -28,9 +28,39 @@ A step-by-step guide for making this tracker your own. No coding needed for step
 *No GitHub?* Download the ZIP (**Code → Download ZIP**), unzip it and double-click `index.html`.
 Everything works offline except the online sync.
 
-## 3. Put your name and dates in (Console)
+## 3. Start your journey (5 minutes)
 
-Open your site and click **Console** in the menu.
+The demo belongs to a made-up learner, IOI, which is why it counts down about 730 days from the day you
+first open it. Replace it with your own plan:
+
+1. On the home page, click the first card, **Start your journey** (or **Start** in the menu).
+2. Answer the six short steps:
+
+| Step | What it asks | What it changes |
+|---|---|---|
+| **You** | First name, title for the home page, city, currency, what you study | Greeting, big title, page text, prices |
+| **Timeline** | Start date, graduation/finish date, exam months, long breaks, low-energy months | Every phase and project date. Fewer projects land in exam months, more in breaks |
+| **Your level** | Where you're starting from; Python, C/C++, linear algebra | Phases you already know shrink to a short review, and their projects are marked *Skipped* |
+| **Focus & goal** | Drones, ground robots, arms or not sure; then study abroad, grad school at home, a job or your own product. For study abroad: countries and the month/year your programme starts | Phase 4–5 projects, the Apply page, deadlines and countdowns |
+| **Time** | Hours per week, your weekend days, morning/evening/night, when your day starts and ends | Daily targets, planned blocks and the first day of your week |
+| **Tools & tests** | What you already own; whether you still need an English test | Parts inventory and shopping list; IELTS/TOEFL, JLPT or TOPIK dates |
+
+3. **Review** shows everything that will be built: phases with dates, deadlines with their sources,
+   daily hours and parts. Warnings appear if a deadline has already passed or the time is too short.
+4. Press **Build my journal ✦**. The site rebuilds itself and takes you back to the home page.
+
+**Where do the deadlines come from?** The journal has no server, so it doesn't search the web
+live. It uses a built-in table of application windows taken from each programme's official page (MEXT,
+CSC, Open Doors, GKS, Chevening, EducationUSA, JLPT), and every date links to its source. Windows move a
+little each year, so on the Review step press **Copy a research prompt** and paste it into Claude or any
+AI with web search to double-check them for your nationality. Fix anything that changed in
+**Console → Hard dates**.
+
+You can run **Start your journey** again at any time (it remembers your answers). It re-dates everything
+but keeps your ticks, notes and daily log.
+
+## 4. Fine-tune anything (Console)
+After setup, open **Console** in the menu to change any single detail.
 
 | Card | What to do |
 |---|---|
@@ -42,10 +72,8 @@ Open your site and click **Console** in the menu.
 
 The page reloads after each save. To undo all of it, use **Backup → Reset console edits**.
 
-> The demo learner's dates are counted from the first day you open the site, so the plan always starts "now".
-> Set your own start date in **Profile** to move every phase at once.
 
-## 4. Use it every day
+## 5. Use it every day
 
 - **Daily page.** Pick an activity at the top (Build, Study, …), then click or drag across the squares
   for the time you actually worked. Click a filled square again to clear it. Dashed squares are your plan.
@@ -59,7 +87,7 @@ The page reloads after each save. To undo all of it, use **Backup → Reset cons
 
 Your progress saves automatically in the browser you are using.
 
-## 5. See the same progress on every device (optional)
+## 6. See the same progress on every device (optional)
 
 Progress lives in each browser separately until you connect a **private GitHub Gist**:
 
@@ -71,7 +99,7 @@ Progress lives in each browser separately until you connect a **private GitHub G
 It syncs when the page opens, every 5 minutes, and a few seconds after each change. On a shared computer,
 press **Forget on this device** when you're done. More detail: [`docs/SYNC.md`](docs/SYNC.md).
 
-## 6. Back up
+## 7. Back up
 
 **Console → Backup → Export JSON** downloads everything (progress, notes, parts, daily log, your edits).
 **Import JSON** restores it, on any device.
@@ -97,8 +125,10 @@ press **Forget on this device** when you're done. More detail: [`docs/SYNC.md`](
 | Problem | Fix |
 |---|---|
 | The site shows a 404 | Pages takes a minute after you turn it on. Check **Settings → Pages** says "Your site is live". |
-| My progress disappeared | Progress is per browser. Did you switch browser, use a private window, or clear site data? Use sync (step 5) or Import a backup. |
+| My progress disappeared | Progress is per browser. Did you switch browser, use a private window, or clear site data? Use sync (step 6) or Import a backup. |
 | Sync says "Token rejected (401)" | The token expired or lacks *Gists: Read and write*. Make a new one. |
 | Sync says "Gist not found (404)" | The Gist ID is wrong, or the token belongs to a different GitHub account. |
 | Squares shifted after changing the tracker | Changing the start time or square length moves where old ticks fall. Change those settings before you start logging. |
 | Want to start over | **Console → Reset console edits**, then clear the site's data in your browser settings. |
+| A deadline in my plan is wrong | Windows change yearly. Check the linked official page, then edit it in **Console → Hard dates** or run **Start your journey** with a different start year. |
+| "Dates have already passed" warning | Your chosen programme start is too soon. Pick a later year on the Focus & goal step. |

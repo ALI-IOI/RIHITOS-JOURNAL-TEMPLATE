@@ -371,7 +371,10 @@ const BUY0=[
 ];
 
 /* ---------- home cards ---------- */
+const CUSTOM_DONE=()=>{try{const c=JSON.parse(localStorage.getItem(KEY+"-custom")||"{}"); return !!(c&&c.wizard&&c.wizard.built);}catch(e){return false;}};
 const DECK=[
+ {k:"start",n:"Start your journey",ty:"Setup",c:"#ff2a6d",holo:1,art:"flag",st:H=>CUSTOM_DONE()?["Built","✓"]:["Steps",6],
+  m:[["Answer",H=>"6","You, your timeline, level, focus, goal, time and tools."],["Rebuild",H=>CUSTOM_DONE()?"Done":"Go","Phases, deadlines, exams, daily plan and parts, made for you."]],w:["Guessing","Generic plans","5 min"],f:"Tell it where you're going. It redraws the whole map around you."},
  {k:"mission",n:"Mission",ty:"Overview",c:"var(--accent)",holo:1,art:"drone",st:H=>["Days left",H.daysTo(PROFILE.end)],
   m:[["Gate check",H=>MAIN.length,"Seven phases, each closed by a project you finish or don't."],["Now playing",H=>H.curPhase().code.replace("PH ","P"),"The phase you're in and the gate that ends it."]],w:["Drift","Busy weeks","5 min"],f:"The whole climb, from a first circuit to a robot that maps a room."},
  {k:"tracker",n:"Tracker",ty:"Progress",c:"var(--blue)",holo:1,art:"check",st:H=>["Items",ITEMS.filter(H.countable).length],
@@ -443,4 +446,64 @@ countries:[
  {n:"Industry job",role:"Route B",ph:"p3",li:["Robotics software, embedded and test roles all value ROS 2, C++ and a working robot on video.","Apply with your portfolio site and two projects that match the job.","Contributions to Nav2, PX4 or ros2_control are read by the same teams that hire."],uni:"Look at company career pages and robotics job boards; meetups and competitions are where referrals happen.",links:[["ROS Discourse jobs","https://discourse.openrobotics.org/c/jobs/15"]]},
  {n:"Your own product",role:"Route C",ph:"p6",li:["Start from a problem five real people describe the same way.","Build the smallest robot that solves part of it, and measure the result.","Startup programmes and accelerators accept solo technical founders."],uni:"Your capstone (C1–C3) is the prototype.",links:[["YC Startup School","https://www.startupschool.org/"],["The Mom Test","https://www.momtestbook.com/"]]}],
 timeline:[[MY(MO(13)),"First merged open-source PR","PF5","p3",0],[MY(MO(14)),"Portfolio launch","PF6","p4",1],[MY(MO(19)),"CV v1","PF7","p5",0],[MY(MO(19)),"Applications open","X1","p5",1],[MY(MO(21)),"Short paper written","X4","p5",0],[MY(MO(24)),"Capstone demo","C3","p6",0],[MY(MO(24)),"Applications or launch done","G1","p6",1]]
+};
+
+/* =====================================================================
+   START YOUR JOURNEY · data for the setup questions
+   Application windows below come from the official pages linked in `src`
+   (checked October 2026). They shift a little every year: the journal shows
+   the link next to every date so you can confirm it.
+   ===================================================================== */
+const WIZARD={
+  // y = intake year (the year your programme starts). Each rule returns [label, date, hard, link]
+  routes:{
+    japan:{n:"Japan · MEXT scholarship",role:"Research student via your Japanese embassy",ph:"p4",src:"https://www.studyinjapan.go.jp/en/smap-stopj-applications-research.html",
+      fact:"Embassy recruitment for April or September/October arrival is held in April–May of the previous year; first screening runs May–July.",
+      dates:y=>[["Research plan and documents ready",`${y-1}-03-31`,0],["MEXT embassy application (Apr–May)",`${y-1}-04-15`,1],["First screening (May–Jul)",`${y-1}-07-15`,0],["Contact professors for acceptance letters",`${y-1}-09-30`,0]],
+      tests:["english","jlpt"]},
+    china:{n:"China · CSC scholarship",role:"Chinese Government Scholarship",ph:"p5",src:"https://www.campuschina.org/",
+      fact:"For September entry, embassy deadlines fall early in the same year (for example 8 Feb 2026 for September 2026 via the Melbourne consulate); some embassies and universities close later.",
+      dates:y=>[["Shortlist universities and supervisors",`${y-1}-11-30`,0],["CSC application (check your embassy's deadline)",`${y}-02-01`,1]],tests:["english"]},
+    russia:{n:"Russia · Open Doors olympiad",role:"Tuition-free Master's through a two-stage olympiad",ph:"p5",src:"https://int.itmo.ru/en/opendoors",
+      fact:"Final-year Bachelor's students can enter. In the 2026 round, stage 1 (portfolio) ran 2–12 November and stage 2 ran 17 November – 7 December.",
+      dates:y=>[["Open Doors stage 1: portfolio (early Nov)",`${y-1}-11-02`,1],["Open Doors stage 2: problem solving (Nov–Dec)",`${y-1}-11-17`,0]],tests:["english"]},
+    korea:{n:"South Korea · GKS scholarship",role:"Global Korea Scholarship, embassy track",ph:"p5",src:"https://www.studyinkorea.go.kr/",
+      fact:"The 2026 embassy track accepted online applications 12–25 February. Scholars start with a one-year Korean course, then the degree.",
+      dates:y=>[["GKS embassy-track application (February)",`${y}-02-12`,1]],tests:["english","topik"]},
+    uk:{n:"United Kingdom · Chevening",role:"One-year Master's, fully funded",ph:"p5",src:"https://www.chevening.org/scholarships/application-timeline/",
+      fact:"For 2027–28 study, applications ran 4 August – 6 October 2026, interviews March–April 2027, results from mid-June, study from September/October 2027.",
+      dates:y=>[["Chevening application opens (early Aug)",`${y-1}-08-04`,0],["Chevening application closes (early Oct)",`${y-1}-10-06`,1],["Chevening interviews (Mar–Apr)",`${y}-03-15`,0]],tests:["english"]},
+    usa:{n:"United States · graduate school",role:"MS or PhD, funded by assistantships or fellowships",ph:"p5",src:"https://educationusa.state.gov/your-5-steps-us-study/research-your-options/graduate",
+      fact:"EducationUSA advises starting your search 12–18 months before the academic year you want to begin. Each programme sets its own deadline.",
+      dates:y=>[["Start shortlisting programmes (12–18 months ahead)",`${y-2}-09-01`,0],["Plan to have applications in (check each programme)",`${y-1}-12-01`,1]],tests:["english"]},
+    other:{n:"Another country",role:"Your own target",ph:"p5",src:"",
+      fact:"Find the official scholarship or admissions page for your country and replace these planning dates in Console → Hard dates.",
+      dates:y=>[["Applications in (planning date, about 9 months before start)",`${y-1}-12-01`,1]],tests:["english"]}
+  },
+  tests:{
+    english:{n:"English test: IELTS Academic or TOEFL iBT",links:[["IELTS","https://ielts.org/"],["TOEFL","https://www.ets.org/toefl.html"]]},
+    jlpt:{n:"JLPT (Japanese), held in July and December",links:[["JLPT","https://www.jlpt.jp/e/"]]},
+    topik:{n:"TOPIK (Korean)",links:[["TOPIK","https://www.topik.go.kr/"]]}
+  },
+  // what changes in phase 4–5 by focus
+  focus:{
+    aerial:{label:"Drones / aerial robots",lx:"Drones",p4:"Drones + control",p5:"Autonomy + research"},
+    ground:{label:"Mobile / ground robots",lx:"Autonomy",p4:"Advanced mobile robots",p5:"Autonomy + research",
+      items:{D1:["Kinematics of a differential and Ackermann robot","Wheel models, turning radius, why cars can't turn on the spot.",[["Modern Robotics (free book + videos)","https://hades.mech.northwestern.edu/index.php/Modern_Robotics"]]],
+        D2:["Localisation on a saved map (AMCL)","Particle filter localisation inside Nav2; measure how fast it recovers.",[["Nav2 documentation","https://docs.nav2.org/"]]],
+        D3:["Tune Nav2 controllers and costmaps","Compare two controllers on the same course; log time and path error.",[["Nav2 documentation","https://docs.nav2.org/"]]],
+        D4:["Outdoor or larger-scale run","GPS or visual odometry outdoors, or a bigger indoor map.",[["RoboRacer (F1TENTH) course kit","https://f1tenth-coursekit.readthedocs.io/"]]],
+        D5:["Autonomous mission: patrol a route and report","Waypoints, obstacle avoidance and a logged report. The gate project.",[["slam_toolbox","https://github.com/SteveMacenski/slam_toolbox"]]]}},
+    arms:{label:"Robot arms / manipulation",lx:"Arms",p4:"Arms + manipulation",p5:"Perception + research",
+      items:{D1:["Forward and inverse kinematics of a 3-DOF arm","Homogeneous transforms, Jacobians, workspace.",[["Modern Robotics (free book + videos)","https://hades.mech.northwestern.edu/index.php/Modern_Robotics"]]],
+        D2:["Simulate an arm with MoveIt 2","Load a URDF, plan around an obstacle in RViz.",[["MoveIt 2 documentation","https://moveit.picknik.ai/main/index.html"]]],
+        D3:["ros2_control for a hobby servo arm","Real joints under ROS 2 control.",[["ros2_control","https://control.ros.org/"]]],
+        D4:["Pick and place with a camera","Detect an object, compute its pose, grasp it.",[["Robotic Manipulation (MIT)","https://manipulation.mit.edu/"]]],
+        D5:["Sort objects by colour, end to end","Perception + planning + control in one demo. The gate project.",[["MoveIt 2 documentation","https://moveit.picknik.ai/main/index.html"]]]}},
+    general:{label:"Not sure yet",lx:"Robots",p4:"Pick a platform",p5:"Autonomy + research",
+      items:{D1:["Try three platforms in simulation","A drone in PX4 SITL, an arm in MoveIt 2, a rover in Nav2. Keep notes.",[["PX4 simulation","https://docs.px4.io/main/en/simulation/"],["MoveIt 2 documentation","https://moveit.picknik.ai/main/index.html"],["Nav2 documentation","https://docs.nav2.org/"]]]}}
+  },
+  // what you already own → parts inventory
+  owned:[["arduino","Arduino Uno or compatible","Boards"],["esp32","ESP32 dev board","Boards"],["pi","Raspberry Pi","Computers & cameras"],["sensors","Sensor kit (IMU, ultrasonic, light)","Sensors"],["motors","Motors and a motor driver","Motors & drivers"],["printer","3D printer (or access to one)","Tools"],["meter","Multimeter","Tools"],["drone","A small drone","Drone & flight"]],
+  buyMap:{meter:["Digital multimeter"],motors:["TB6612FNG motor driver","Two-wheel robot chassis kit","Encoder gear motor pair"],sensors:["HC-SR04 ultrasonic sensor","MPU-6050 or BMI270 IMU breakout"],esp32:["ESP32 dev board"],pi:["Raspberry Pi + power supply + microSD","Pi camera module"],drone:["Small research drone or sub-250 g kit"]}
 };

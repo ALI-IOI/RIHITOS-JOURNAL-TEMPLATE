@@ -59,6 +59,7 @@ document.addEventListener("change",e=>{const el=e.target; if(el.matches("select.
 
 let scene={};
 const VIEWS=[["home","Home"],["mission","Mission"],["tracker","Tracker"],["daily","Daily"],["board","Board"],["plan","Plan"],["learn","Learn"],["books","Books"],["parts","Parts"],["cred","Credentials"],["skills","Skills"],["community","Community"],["port","Portfolio"],["apply","Apply"],["console","Console"]];
+if(typeof WIZARD!=="undefined") VIEWS.splice(1,0,["start","Start"]);
 const nav=document.getElementById("nav"), onav=document.getElementById("overlay-nav"), overlay=document.getElementById("overlay");
 nav.innerHTML=VIEWS.map(([k,n])=>`<button class="tab" role="tab" id="tab-${k}" data-view="${k}" aria-selected="false">${n}</button>`).join("");
 onav.innerHTML=VIEWS.map(([k,n])=>`<button data-view="${k}">${n}</button>`).join("");
@@ -267,6 +268,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-pt]"); if(
   if(k==="bought"){const x=parts.buy.find(p=>p.id===id); if(!x) return; changeParts(()=>{parts.buy=parts.buy.filter(p=>p.id!==id); const d=new Date(); parts.inv.push({id:uidP("i"),name:x.name,qty:x.qty||1,cat:PCATS.includes(x.cat)?x.cat:"Other",note:"Bought "+fmtMon(d.toISOString().slice(0,7))+(x.for?" for "+x.for:"")}); if(ptEdit&&ptEdit.id===id) ptEdit=null;},`Moved “${x.name}” to inventory.`); return;}
 });
 const ART={
+ flag:'<svg viewBox="0 0 160 100"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 86 C50 70 60 40 92 34 S130 24 142 12" stroke-dasharray="4 6"/><circle cx="20" cy="86" r="5"/><path d="M138 40V8l18 7-18 7"/><circle cx="92" cy="34" r="3"/><circle cx="56" cy="62" r="3"/></g></svg>',
  cal:'<svg viewBox="0 0 160 100"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="30" y="14" width="100" height="76" rx="6"/><path d="M30 30h100" opacity=".7"/><path d="M44 8v12M116 8v12"/></g><g fill="currentColor"><rect x="40" y="38" width="10" height="10" rx="1.5"/><rect x="54" y="38" width="10" height="10" rx="1.5"/><rect x="68" y="52" width="10" height="10" rx="1.5"/><rect x="96" y="52" width="10" height="10" rx="1.5"/><rect x="54" y="66" width="10" height="10" rx="1.5"/><rect x="110" y="66" width="10" height="10" rx="1.5"/></g><g fill="none" stroke="currentColor" stroke-width="1" opacity=".35"><rect x="68" y="38" width="10" height="10"/><rect x="82" y="38" width="10" height="10"/><rect x="40" y="52" width="10" height="10"/><rect x="82" y="66" width="10" height="10"/></g></svg>',
  drone:'<svg viewBox="0 0 160 100"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M50 30l60 40M110 30l-60 40"/><rect x="68" y="40" width="24" height="20" rx="4"/><ellipse cx="50" cy="30" rx="20" ry="5"/><ellipse cx="110" cy="30" rx="20" ry="5"/><ellipse cx="50" cy="70" rx="20" ry="5"/><ellipse cx="110" cy="70" rx="20" ry="5"/><path d="M80 60v10M74 76h12" opacity=".6"/></g></svg>',
  check:'<svg viewBox="0 0 160 100"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="40" y="12" width="80" height="78" rx="8"/><path d="M52 32l6 6 10-12M52 54l6 6 10-12M52 76l6 6"/><path d="M78 32h30M78 54h30M78 76h22" opacity=".6"/></g></svg>',
@@ -304,7 +306,7 @@ function renderDeck(){
   renderLx();
   const host=document.getElementById("deck"); if(!host) return;
   host.innerHTML=DECK.map((c,i)=>{const [sl,sv]=c.st(H); const cost=n=>`<span class="bw-cost">${"<i></i>".repeat(n)}</span>`;
-    return `<button type="button" class="bw t-${c.k==="apply"?"red":i%2?"white":"black"}" data-go="${c.k}" style="--i:${i}" aria-label="${esc(c.n)}: open this section">
+    return `<button type="button" class="bw t-${c.k==="apply"||c.k==="start"?"red":i%2?"white":"black"}" data-go="${c.k}" style="--i:${i}" aria-label="${esc(c.n)}: open this section">
       <span class="bw-glass"></span><span class="bw-tex"></span><span class="bw-art" aria-hidden="true">${ART[c.art]}</span>
       <span class="bw-body">
         <span class="bw-top"><span class="bw-stage">${esc(c.ty)}</span><span class="bw-hp"><small>${esc(sl)}</small><b>${esc(sv)}</b><i class="bw-type"></i></span></span>
@@ -524,7 +526,7 @@ scene=(function(){
     rings.forEach(r=>{const c=col(r.v); r.m.color.copy(c); r.m2.color.copy(c);});
     const dark=currentTheme()==="dark"; pm.opacity=dark?.6:.35; pathMat.opacity=dark?.5:.42; grid.material.opacity=dark?.16:.24; if(reduce) draw();};
   const curIdx=(()=>{const i=MAIN.findIndex(p=>d(p.start)<=today&&today<=d(p.end)); if(i>=0) return i; const n=MAIN.findIndex(p=>d(p.start)>today); return n<0?6:n;})();
-  const VIEWT={daily:.23,console:.97,tracker:.18,board:.28,plan:.38,learn:.48,books:.515,parts:.545,cred:.575,skills:.66,community:.74,port:.83,apply:.93};
+  const VIEWT={start:.06,daily:.23,console:.97,tracker:.18,board:.28,plan:.38,learn:.48,books:.515,parts:.545,cred:.575,skills:.66,community:.74,port:.83,apply:.93};
   const home=(curIdx+1)/(P.length+1);
   let targetT=home, t=home, roam=true, clock=0;
   let boost=0, currentViewKey="home", loopMode=true, lastU=0, loopU=0; const LOOP=30;
@@ -725,11 +727,11 @@ setInterval(()=>{const n=new Date(); n.setHours(0,0,0,0); if(+n!==+today){const 
 
 /* ---------- console ---------- */
 let CUSTOM=window.CUSTOM||{};
-function saveCustom(next,msg){
+function saveCustom(next,msg,view){
   next.u=Date.now(); CUSTOM=next;
   try{localStorage.setItem(CKEY,JSON.stringify(next));}catch(e){}
   if(mode==="db"&&store&&canWrite) store.doc("custom/state").set({json:JSON.stringify(next),updated:new Date().toISOString()}).catch(()=>{});
-  const go=()=>{try{sessionStorage.setItem(PROFILE.key+"-msg",msg||"Saved"); sessionStorage.setItem(PROFILE.key+"-goto","console");}catch(e){} location.reload();};
+  const go=()=>{try{sessionStorage.setItem(PROFILE.key+"-msg",msg||"Saved"); sessionStorage.setItem(PROFILE.key+"-goto",view||"console");}catch(e){} location.reload();};
   if(gcfg().token&&gcfg().id) pushGist().finally(go); else go();
 }
 const clone=o=>JSON.parse(JSON.stringify(o||{}));
@@ -854,6 +856,204 @@ function weekPct(){const w=weekStartOf(today); let th=0,tt=0; for(let j=0;j<7;j+
 renderConsole();
 if(window.claude&&claude.use){["cs-sync","cs-data"].forEach(id=>{const el=document.getElementById(id); if(el) el.innerHTML=id==="cs-sync"?'<h2>Sync</h2><p class="cs-note">This copy runs on claude.ai and already syncs through your account. Gist sync and backups are available in the GitHub version.</p>':'';}); const d=document.getElementById("cs-data"); if(d) d.hidden=true;}
 window.__J={ITEMS,PHASES,RES,BOOKS,HARD,COUNTDOWNS,DAILY,PROFILE,TEXT,get daily(){return daily;},get prog(){return prog;},bundle,mergeBundle};
+
+/* =====================================================================
+   START YOUR JOURNEY: questions → a journal rebuilt around the answers
+   (only when the data file defines WIZARD)
+   ===================================================================== */
+const HAS_WIZ=typeof WIZARD!=="undefined";
+const MON12=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const wzDefaults=()=>{const s=iso(today), e=iso(addDays(today,730)); return {name:"",title1:"",city:"",currency:PROFILE.currency||"$",study:"",start:s,end:e,exams:[],breaks:[],low:[],
+  level:"0",knows:[],focus:"aerial",goal:"abroad",routes:["japan"],intakeM:"10",intakeY:String(+e.slice(0,4)),englishDone:"no",hours:"15",weekend:[0,6],from:"06:00",to:"24:00",when:"evening",owned:[]};};
+let WZ=Object.assign(wzDefaults(),(CUSTOM&&CUSTOM.wizard)||{}), wzStep=0;
+const WZSTEPS=["You","Timeline","Your level","Focus & goal","Time","Tools & tests","Review"];
+const chip=(name,val,label,on,type="checkbox")=>`<label class="wz-chip"><input type="${type}" name="${name}" value="${esc(val)}" ${on?"checked":""}><span>${esc(label)}</span></label>`;
+const months=(name,label,help)=>`<fieldset class="wz-f"><legend>${label}</legend>${help?`<p class="wz-help">${help}</p>`:""}<div class="wz-chips">${MON12.map((m,i)=>chip(name,i+1,m,(WZ[name]||[]).map(Number).includes(i+1))).join("")}</div></fieldset>`;
+const tf=(id,label,val,type="text",extra="",help="")=>`<label class="wz-f">${label}${help?`<small>${help}</small>`:""}<input id="wz-${id}" name="${id}" type="${type}" value="${esc(val??"")}" ${extra}></label>`;
+function wzRender(){
+  if(!HAS_WIZ) return;
+  document.getElementById("wz-steps").innerHTML=WZSTEPS.map((s,i)=>`<li class="${i<wzStep?"done":i===wzStep?"on":""}"><span>${i+1}</span>${s}</li>`).join("");
+  const R=WIZARD.routes, F=WIZARD.focus; let h="";
+  if(wzStep===0) h=tf("name","Your first name",WZ.name,"text",'required maxlength="24" autocomplete="given-name"')+tf("title1","Title on the home page",WZ.title1||(WZ.name?WZ.name.toUpperCase()+"’S":""),"text",'maxlength="14"',"Line 1 of the big title. Line 2 says JOURNAL.")+
+    tf("city","City and country",WZ.city,"text",'placeholder="e.g. Dhaka, Bangladesh"')+tf("currency","Currency symbol for parts prices",WZ.currency,"text",'maxlength="4"')+tf("study","What are you studying?",WZ.study,"text",'placeholder="e.g. BSc Computer Science, or self-taught"');
+  if(wzStep===1) h=tf("start","Start date",WZ.start,"date","required")+tf("end","Graduation or finish date",WZ.end,"date","required","The day this roadmap should be complete.")+
+    months("exams","Exam months","Study drops to a few hours in these months, so fewer projects land there.")+months("breaks","Long breaks","Holidays you can use for big build sprints.")+months("low","Low-energy months","Fasting, festivals, family events or busy work seasons.");
+  if(wzStep===2) h=`<fieldset class="wz-f"><legend>Where are you starting from?</legend>${[["0","Total beginner: never built a circuit"],["1","Arduino basics done (LEDs, sensors, motors)"],["2","Microcontrollers are easy: ESP32, interrupts, RTOS"],["3","Also Linux, Python and OpenCV on a Raspberry Pi"],["4","I already use ROS 2"]].map(([v,l])=>chip("level",v,l,WZ.level===v,"radio")).join("")}</fieldset>`+
+    `<fieldset class="wz-f"><legend>Already comfortable with</legend><div class="wz-chips">${[["py","Python"],["cpp","C or C++"],["la","Linear algebra"]].map(([v,l])=>chip("knows",v,l,(WZ.knows||[]).includes(v))).join("")}</div></fieldset>`;
+  if(wzStep===3){ h=`<fieldset class="wz-f"><legend>What kind of robots?</legend><div class="wz-chips">${Object.entries(F).map(([k,f])=>chip("focus",k,f.label,WZ.focus===k,"radio")).join("")}</div></fieldset>`+
+    `<fieldset class="wz-f"><legend>After this roadmap I want to…</legend><div class="wz-chips">${[["abroad","Study abroad (Master's / PhD)"],["home","Grad school at home"],["job","Get a robotics job"],["startup","Build my own product"]].map(([v,l])=>chip("goal",v,l,WZ.goal===v,"radio")).join("")}</div></fieldset>`;
+    if(WZ.goal==="abroad") h+=`<fieldset class="wz-f"><legend>Where? Pick one or more</legend><div class="wz-routes">${Object.entries(R).map(([k,r])=>`<label class="wz-route"><input type="checkbox" name="routes" value="${k}" ${(WZ.routes||[]).includes(k)?"checked":""}><b>${esc(r.n)}</b><small>${esc(r.fact)}</small>${r.src?`<a href="${r.src}" target="_blank" rel="noopener">Official page ↗</a>`:""}</label>`).join("")}</div></fieldset>`+
+      `<div class="wz-row">${`<label class="wz-f">Programme starts (month)<select name="intakeM">${MON12.map((m,i)=>`<option value="${i+1}" ${+WZ.intakeM===i+1?"selected":""}>${m}</option>`).join("")}</select></label>`}${tf("intakeY","Programme starts (year)",WZ.intakeY,"number",'min="2026" max="2040"')}</div>`;
+    else h+=`<p class="wz-help">You can switch to studying abroad later by running this setup again.</p>`;}
+  if(wzStep===4) h=`<label class="wz-f">Hours you can give each week: <b id="wz-hv">${esc(WZ.hours)} h</b><input type="range" name="hours" min="4" max="35" step="1" value="${esc(WZ.hours)}"></label>`+
+    `<fieldset class="wz-f"><legend>Your weekend days</legend><div class="wz-chips">${DN.map((n,i)=>chip("weekend",i,n,(WZ.weekend||[]).map(Number).includes(i))).join("")}</div></fieldset>`+
+    `<fieldset class="wz-f"><legend>On weekdays you study best in the</legend><div class="wz-chips">${[["morning","Morning"],["evening","Evening"],["night","Late night"]].map(([v,l])=>chip("when",v,l,WZ.when===v,"radio")).join("")}</div></fieldset>`+
+    `<div class="wz-row">${tf("from","Your day starts",WZ.from,"time")}${tf("to","Your day ends",WZ.to==="24:00"?"23:59":WZ.to,"time")}</div>`;
+  if(wzStep===5) h=`<fieldset class="wz-f"><legend>What do you already own?</legend><div class="wz-chips">${WIZARD.owned.map(([k,l])=>chip("owned",k,l,(WZ.owned||[]).includes(k))).join("")}</div></fieldset>`+
+    (WZ.goal==="abroad"?`<fieldset class="wz-f"><legend>English test (IELTS / TOEFL)</legend><div class="wz-chips">${[["no","I still need to take it"],["yes","I already have a valid score"],["na","Not needed for me"]].map(([v,l])=>chip("englishDone",v,l,WZ.englishDone===v,"radio")).join("")}</div></fieldset>`:"");
+  if(wzStep===6){ const p=wzPlan(); h=`<div class="wz-review"><p>Here is what will be built. Nothing changes until you press <b>Build my journal</b>.</p>
+    <dl><dt>Journal</dt><dd>${esc(p.titleWords.join(" "))} · ${esc(WZ.city||"—")}</dd><dt>Journey</dt><dd>${esc(p.span)} · about ${p.hoursTotal} usable hours</dd>
+    <dt>Phases</dt><dd><ul>${p.phases.map(x=>`<li><b>${esc(x.code)}</b> ${esc(x.name)} · ${esc(x.dates)}${x.skip?" · <i>already known, kept as a short review</i>":""}</li>`).join("")}</ul></dd>
+    <dt>Deadlines</dt><dd>${p.hard.length?`<ul>${p.hard.map(x=>`<li>${esc(x[1])} · <b>${esc(x[2])}</b>${x[4]?` · <a href="${x[4]}" target="_blank" rel="noopener">source ↗</a>`:""}</li>`).join("")}</ul>`:"No external deadlines for this goal."}</dd>
+    <dt>Daily plan</dt><dd>${DN.map((n,i)=>`${n} ${p.daily.targets[i]} h`).join(" · ")}</dd>
+    <dt>Parts</dt><dd>${p.inv.length} owned · ${p.buy.length} to buy over time</dd></dl>
+    ${p.warn.length?`<div class="wz-warn">${p.warn.map(w=>`<p>⚠ ${esc(w)}</p>`).join("")}</div>`:""}
+    <p class="wz-help">Dates for scholarships come from each country's official page (linked) and move a little every year. Want them double-checked? Copy a ready-made prompt and paste it into Claude or any AI with web search.</p>
+    <button type="button" class="btn-ghost" id="wz-prompt">Copy a research prompt</button> <span class="wz-help" id="wz-copied"></span></div>`;}
+  document.getElementById("wz-form").innerHTML=h;
+  document.getElementById("wz-back").style.visibility=wzStep?"visible":"hidden";
+  document.getElementById("wz-next").textContent=wzStep===WZSTEPS.length-1?"Build my journal ✦":"Next →";
+  document.getElementById("wz-err").textContent="";
+  const hr=document.querySelector('#wz-form [name="hours"]'); if(hr) hr.oninput=()=>document.getElementById("wz-hv").textContent=hr.value+" h";
+  const gp=document.getElementById("wz-prompt"); if(gp) gp.onclick=wzCopyPrompt;
+  document.querySelectorAll('#wz-form [name="goal"]').forEach(r=>r.onchange=()=>{wzRead(); wzRender();});
+}
+function wzRead(){
+  const f=document.getElementById("wz-form"); if(!f) return;
+  const multi=new Set(["exams","breaks","low","knows","routes","weekend","owned"]), seen=new Set();
+  [...f.elements].forEach(el=>{if(!el.name) return; const n=el.name;
+    if(multi.has(n)){ if(!seen.has(n)){WZ[n]=[]; seen.add(n);} if(el.checked) WZ[n].push(["exams","breaks","low","weekend"].includes(n)?+el.value:el.value); }
+    else if(el.type==="radio"){ if(el.checked) WZ[n]=el.value; }
+    else WZ[n]=el.value.trim();});
+  if(WZ.to==="23:59"||WZ.to==="00:00") WZ.to="24:00";
+}
+function wzValid(){
+  if(wzStep===0&&!WZ.name) return "Please tell me your first name.";
+  if(wzStep===1){ if(!/^\d{4}-\d{2}-\d{2}$/.test(WZ.start)||!/^\d{4}-\d{2}-\d{2}$/.test(WZ.end)) return "Please pick both dates.";
+    if((d(WZ.end)-d(WZ.start))/864e5<120) return "The finish date needs to be at least four months after the start."; }
+  if(wzStep===3&&WZ.goal==="abroad"){ if(!(WZ.routes||[]).length) return "Pick at least one country, or choose another goal.";
+    const y=+WZ.intakeY; if(!(y>=+WZ.start.slice(0,4))) return "The programme start year should be after your start date."; }
+  if(wzStep===4&&!(WZ.weekend||[]).length) return "Pick at least one weekend day.";
+  return "";
+}
+/* ---------- the planner ---------- */
+const firstSunday=(y,m)=>{const x=new Date(y,m-1,1); x.setDate(1+((7-x.getDay())%7)); return x;};
+function wzPlan(){
+  const S=d(WZ.start), E0=d(WZ.end), warn=[], R=WIZARD.routes, foc=WIZARD.focus[WZ.focus]||WIZARD.focus.aerial;
+  const y=+WZ.intakeY||E0.getFullYear()+1;
+  // deadlines
+  let hard=[];
+  if(WZ.goal==="abroad") (WZ.routes||[]).forEach(k=>{const r=R[k]; if(!r) return; r.dates(y).forEach(([l,dt,hh])=>hard.push([MON12[+dt.slice(5,7)-1]+" "+dt.slice(0,4),l,dt,hh,r.src,k]));});
+  hard.sort((a,b)=>a[2].localeCompare(b[2]));
+  const past=hard.filter(h=>d(h[2])<S); if(past.length) warn.push(`${past.length} date(s) for a ${y} start have already passed. Consider a later start year.`);
+  hard=hard.filter(h=>d(h[2])>=S);
+  const firstHard=hard.find(h=>h[3])||hard[0];
+  let JE=E0; if(firstHard&&d(firstHard[2])>JE) JE=addDays(d(firstHard[2]),90);
+  // tests
+  const tests=[]; const need=new Set(); (WZ.routes||[]).forEach(k=>(R[k]?.tests||[]).forEach(t=>need.add(t)));
+  if(WZ.goal==="abroad"&&firstHard){ const A=d(firstHard[2]);
+    if(need.has("english")&&WZ.englishDone==="no") tests.push(["T1",WIZARD.tests.english.n,iso(addDays(A,-60)),WIZARD.tests.english.links]);
+    if(need.has("jlpt")){ let cand=[]; for(let yy=S.getFullYear();yy<=A.getFullYear();yy++) [7,12].forEach(m=>{const x=firstSunday(yy,m); if(x>=addDays(S,120)&&x<=A) cand.push(x);}); const x=cand.pop(); if(x) tests.push(["T2",WIZARD.tests.jlpt.n.replace(", held in July and December","")+" (first Sunday of "+MON12[x.getMonth()]+", check jlpt.jp)",iso(x),WIZARD.tests.jlpt.links]); else warn.push("No JLPT sitting fits before the application. Consider a later start year."); }
+    if(need.has("topik")) tests.push(["T3",WIZARD.tests.topik.n,iso(addDays(A,-30)),WIZARD.tests.topik.links]);
+  }
+  tests.forEach(t=>{if(d(t[2])<S) {warn.push(t[1]+" would fall before your start date; it was moved to 60 days in."); t[2]=iso(addDays(S,60));}});
+  // capacity-weighted phase split
+  const capOf=dt=>{const m=dt.getMonth()+1; return (WZ.exams||[]).includes(m)?.25:(WZ.breaks||[]).includes(m)?1.5:(WZ.low||[]).includes(m)?.6:1;};
+  const lvl=+WZ.level||0, skipK=["p1","p1b","p2","p3"].slice(0,lvl);
+  const W={p1:2,p1b:2.5,p2:4,p3:5,p4:4.5,p5:3,p6:3}; skipK.forEach(k=>W[k]=.3);
+  const split=(a,b,keys)=>{const days=Math.max(1,Math.round((b-a)/864e5)), cum=[0]; for(let i=0;i<days;i++) cum.push(cum[i]+capOf(addDays(a,i)));
+    const tot=keys.reduce((s,k)=>s+W[k],0), out={}; let acc=0, prev=0;
+    keys.forEach((k,j)=>{acc+=W[k]; const target=cum[days]*acc/tot; let i=prev; while(i<days&&cum[i]<target) i++; if(j===keys.length-1) i=days; out[k]=[iso(addDays(a,prev)),iso(addDays(a,Math.max(prev+6,i)-1))]; prev=Math.max(prev+6,i);}); return out;};
+  let win={};
+  if(WZ.goal==="abroad"&&firstHard&&(d(firstHard[2])-S)/864e5>=240){ const T=addDays(d(firstHard[2]),-30);
+    Object.assign(win,split(S,T,["p1","p1b","p2","p3","p4"])); const mid=addDays(T,Math.round((JE-T)/864e5*.5)); Object.assign(win,split(addDays(T,0),mid,["p5"]),split(mid,addDays(JE,1),["p6"])); }
+  else { if(WZ.goal==="abroad"&&firstHard) warn.push("Less than eight months before your first deadline: the full roadmap is spread to your finish date instead, so lean on the projects you already have.");
+    win=split(S,addDays(JE,1),["p1","p1b","p2","p3","p4","p5","p6"]); }
+  const names={p4:foc.p4,p5:foc.p5}, codes={p1:"PH 1",p1b:"PH 1b",p2:"PH 2",p3:"PH 3",p4:"PH 4",p5:"PH 5",p6:"PH 6"};
+  const SPANf=(a,b)=>{const x=d(a),z=d(b); return MON12[x.getMonth()]+" "+x.getFullYear()+" – "+MON12[z.getMonth()]+" "+z.getFullYear();};
+  const phases=MAIN.map(p=>({k:p.k,code:codes[p.k]||p.code,name:names[p.k]||p.name,start:win[p.k][0],end:win[p.k][1],dates:SPANf(win[p.k][0],win[p.k][1]),skip:skipK.includes(p.k)}));
+  // hours
+  const H=Math.max(1,+WZ.hours||15), wk=(WZ.weekend||[]).map(Number), nW=7-wk.length;
+  const r5=x=>Math.max(0,Math.round(x*2)/2);
+  const targets=DN.map((_,i)=>wk.includes(i)?r5(H*.45/Math.max(1,wk.length)):r5(H*.55/Math.max(1,nW)));
+  const base={morning:"06:30",evening:"19:00",night:"21:30"}[WZ.when]||"19:00";
+  const addT=(t,h)=>{const m=hm2m(t)+Math.round(h*60); return m>=1440?"24:00":m2hm(m);};
+  const acts=DAILY.acts||[["Build","#ff2a6d"]];
+  const plan=DN.map((_,i)=>{const t=targets[i]; if(!t) return []; if(wk.includes(i)){const a="09:00", half=r5(t/2)||t; return t>=2?[`${a}-${addT(a,half)} ${acts[0][0]}`,`14:00-${addT("14:00",t-half)} ${(acts[2]||acts[0])[0]}`]:[`${a}-${addT(a,t)} ${acts[0][0]}`];}
+    const h1=r5(t/2)||t; return t>=1.5?[`${base}-${addT(base,h1)} ${(acts[1]||acts[0])[0]}`,`${addT(base,h1)}-${addT(base,t)} ${acts[0][0]}`]:[`${base}-${addT(base,t)} ${(acts[1]||acts[0])[0]}`];});
+  const weeks=(JE-S)/864e5/7, avgCap=(()=>{let s=0,n=0; for(let x=new Date(S);x<JE;x=addDays(x,7)){s+=Math.min(1,capOf(x)); n++;} return n?s/n:1;})();
+  const hoursTotal=Math.round(weeks*H*avgCap*.8/50)*50;
+  // parts
+  const own=new Set(WZ.owned||[]), drop=new Set(); own.forEach(k=>(WIZARD.buyMap[k]||[]).forEach(n=>drop.add(n)));
+  const inv=WIZARD.owned.filter(o=>own.has(o[0])).map(o=>[o[1],1,o[2],"From setup"]);
+  const name=WZ.name||"You", t1=(WZ.title1||name.toUpperCase()+"’S").toUpperCase();
+  return {S,JE,span:SPANf(WZ.start,iso(JE)),phases,hard,tests,targets,daily:{targets,plan},inv,buy:BUY0.filter(b=>!drop.has(b[0])),warn,hoursTotal,foc,titleWords:[t1,"JOURNAL"],name,y};
+}
+function wzBuildCustom(p){
+  const c=JSON.parse(JSON.stringify(CUSTOM||{})); const name=p.name, city=WZ.city||"", months=Math.round((p.JE-p.S)/864e5/30.4);
+  const goalTxt={abroad:"a graduate programme abroad",home:"graduate school",job:"a robotics job",startup:"my own robotics product"}[WZ.goal];
+  const dest=WZ.goal==="abroad"?(WZ.routes||[]).map(k=>WIZARD.routes[k].n.split(" · ")[0]).join(" / "):({home:"grad school",job:"a robotics job",startup:"a product launch"}[WZ.goal]);
+  c.wizard=Object.assign({},WZ,{built:new Date().toISOString()});
+  c.profile=Object.assign({},c.profile,{name,first:name,title:`${name}'s Journal`,titleWords:p.titleWords,currency:WZ.currency||"$",start:WZ.start,end:iso(p.JE),weekStart:(()=>{const w=(WZ.weekend||[]).map(Number); const last=w.find(x=>!w.includes((x+1)%7)); return last==null?1:(last+1)%7;})()});
+  c.text=Object.assign({},c.text,{brand:name,brandSub:`${name}'s Journal`,coords:city||"Day one",
+    kicker:`A field log of everything I build, from my first project to <span>${esc(p.foc.label.toLowerCase())}</span>`,
+    homeLine:`Every build, gate and deadline on the way${city?` from ${esc(city.split(",")[0])}`:""} to ${esc(goalTxt)}, logged in one place.`,
+    capLeft:`${esc(WZ.study||"Self-taught")} · <b>${esc(p.foc.label)}</b>`,capRight:`${months} months · <b>~${+WZ.hours} h/week</b>`,
+    lede:`From ${["a first circuit","Arduino basics","embedded firmware","Linux and vision","ROS 2"][+WZ.level||0]} to ${esc(p.foc.label.toLowerCase())} and ${esc(goalTxt)}. Every build carries intention, data and a story you don't see in the code.`,
+    applyEyebrow:WZ.goal==="abroad"?`${dest} · ${MON12[+WZ.intakeM-1]} ${WZ.intakeY} start`:"After the roadmap",
+    applyLede:WZ.goal==="abroad"?"Your target routes, with the planning dates used in this journal. Each date comes from the official page linked on its card; confirm it every year before you rely on it.":"The routes that fit your goal, and how the portfolio turns into the next step.",
+    footer:`${esc(name)}'s Journal<br>${esc(city||"Day one")} → ${esc(dest)} · ${WZ.start.slice(0,4)}–${iso(p.JE).slice(0,4)}`});
+  const hard=p.hard.map(h=>[h[0],h[1],h[2],h[3],h[4]||""]);
+  p.tests.forEach(t=>hard.push([MON12[+t[2].slice(5,7)-1]+" "+t[2].slice(0,4),t[1],t[2],0,t[3][0][1]]));
+  hard.push([MON12[p.JE.getMonth()]+" "+p.JE.getFullYear(),"Finish line: roadmap complete",iso(p.JE),0,""]);
+  c.hard=hard.sort((a,b)=>a[2].localeCompare(b[2]));
+  const fh=p.hard.find(h=>h[3])||p.hard[0], p4=p.phases.find(x=>x.k==="p4");
+  c.countdowns=[fh?{label:"Days to "+fh[1].replace(/\s*\(.*\)$/,""),date:fh[2],hard:1}:{label:"Days to the portfolio launch",date:p4.end,hard:1},
+    p.tests[0]?{label:"Days to "+p.tests[0][1].split(":")[0].split("(")[0].trim(),date:p.tests[0][2]}:(fh?{label:"Days to the "+p.phases[4].name+" gate",date:p4.end}:{label:"Days to the "+p.phases[5].name+" gate",date:p.phases[5].end}),
+    {label:"Days to the finish line",date:iso(p.JE)}];
+  c.daily=Object.assign({},c.daily,{from:WZ.from||"06:00",to:WZ.to||"24:00",targets:p.daily.targets,plan:p.daily.plan});
+  c.phases={}; p.phases.forEach(x=>c.phases[x.k]={name:x.name,dates:x.dates,start:x.start,end:x.end,
+    gate:x.k==="p4"?{aerial:PH.p4.gate,ground:"The robot patrols a route on its own, avoids people and logs a report.",arms:"The arm sorts objects by colour from camera input, end to end.",general:"One gate project finished on the platform you picked."}[WZ.focus]||PH.p4.gate:PH[x.k].gate});
+  ["lang","cred","port","skill"].forEach(k=>c.phases[k]={start:WZ.start,end:iso(p.JE),dates:k==="skill"?"Just in time":k==="cred"?"As needed":"Ongoing"});
+  // re-date every item into its new phase window
+  const oldP=Object.fromEntries(PHASES.map(x=>[x.k,[x.start,x.end]])), newP=Object.fromEntries(p.phases.map(x=>[x.k,[x.start,x.end]]));
+  const remap=(due,[a0,b0],[a1,b1])=>{const f=Math.max(0,Math.min(1,(d(due)-d(a0))/Math.max(1,d(b0)-d(a0)))); return iso(addDays(d(a1),Math.round(f*(d(b1)-d(a1))/864e5)));};
+  c.items={};
+  ITEMS.forEach(it=>{ if(/^T\d$/.test(it.id)&&it.phase==="cred") return;
+    const nd=newP[it.phase]?remap(it.due,oldP[it.phase],newP[it.phase]):remap(it.due,[PROFILE.start,PROFILE.end],[WZ.start,iso(p.JE)]);
+    c.items[it.id]={due:nd,target:MON12[+nd.slice(5,7)-1]+" "+nd.slice(0,4)};});
+  Object.entries((p.foc.items)||{}).forEach(([id,[t,desc,links]])=>{c.items[id]=Object.assign(c.items[id]||{},{title:t,desc,links});});
+  ["T1","T2","T3"].forEach(id=>{ if(BY[id]&&!p.tests.find(t=>t[0]===id)) c.items[id]=null; });
+  p.tests.forEach(([id,t,dt,links])=>c.items[id]={title:t,phase:"cred",due:dt,target:MON12[+dt.slice(5,7)-1]+" "+dt.slice(0,4),star:true,desc:"Book the test date early; scores take a few weeks to arrive.",links});
+  // home stage, plan text, apply page
+  c.lx=[["Electronics","p1"],["Embedded","p1b"],["ROS 2","p3"],[p.foc.lx,"p4"]];
+  const mlist=a=>(a||[]).map(m=>MON12[m-1]).join(", ")||"none";
+  c.plan={how:{sub:`${p.span} · about ${p.hoursTotal.toLocaleString("en-US")} usable hours`,body:`<p>${months} months at about ${+WZ.hours} hours a week, with study cut back in exam months and a 20% buffer for bad weeks. Each phase ends in a <b>gate</b>: a project you either finish or don't.${fh?` Your first hard date is <b>${esc(fh[1])}</b> on ${esc(fh[2])}, so phases 1–4 are packed before it.`:""}</p><div class="mini-wrap"><table class="mini"><tr><th>Mode</th><th>Months</th><th>Hours/wk</th><th>Rule</th></tr><tr><td>Normal</td><td>The rest</td><td>${+WZ.hours}</td><td>Follow the phase plan</td></tr><tr><td>Exam</td><td>${mlist(WZ.exams)}</td><td>${Math.max(2,Math.round(+WZ.hours/5))}</td><td>Review cards and one small rebuild</td></tr><tr><td>Sprint</td><td>${mlist(WZ.breaks)}</td><td>${Math.round(+WZ.hours*1.6)}</td><td>Big builds; keep days off</td></tr><tr><td>Low</td><td>${mlist(WZ.low)}</td><td>${Math.round(+WZ.hours*.6)}</td><td>Lighter projects, reading, theory</td></tr></table></div><p><b>Falling behind?</b> Cut stretch projects and optional credentials first. Never cut the review habit or ★ items.</p>`}};
+  p.phases.forEach(x=>c.plan[x.k]={h:`${x.code.replace("PH ","Phase ")}: ${x.name}`,sub:x.dates});
+  if(WZ.goal==="abroad") c.apply={countries:(WZ.routes||[]).map(k=>{const r=WIZARD.routes[k]; return {n:r.n,role:r.role,ph:r.ph,li:[esc(r.fact),...p.hard.filter(h=>h[5]===k).map(h=>`<b>${esc(h[1])}</b>: ${esc(h[2])}`)],uni:"Confirm every date on the official page before you plan around it; windows move a little each year.",links:r.src?[["Official page",r.src]]:[]};}),
+    timeline:c.hard.map(h=>[h[0],h[1],(p.tests.find(t=>t[2]===h[2])||["G1"])[0],"p5",h[3]])};
+  else { const keep={home:"Graduate school",job:"Industry job",startup:"Your own product"}[WZ.goal]; c.apply={countries:APPLY.countries.filter(x=>x.n===keep).concat(APPLY.countries.filter(x=>x.n!==keep).slice(0,1)),timeline:APPLY.timeline}; }
+  return c;
+}
+function wzCopyPrompt(){
+  const p=wzPlan(), R=WIZARD.routes;
+  const txt=`I'm planning a self-study robotics roadmap. Please use web search on official sources only and check these planning dates for a programme starting ${MON12[+WZ.intakeM-1]} ${WZ.intakeY}.\n\nMe: ${WZ.study||"self-taught"}, ${WZ.city||"[my country]"}. Finish date ${WZ.end}. Focus: ${p.foc.label}. Goal: ${WZ.goal}.\n\nDates to verify:\n${p.hard.map(h=>`- ${h[1]}: ${h[2]} (source I used: ${h[4]||"none"})`).join("\n")||"- none"}\n${p.tests.map(t=>`- ${t[1]}: ${t[2]}`).join("\n")}\n\nFor each: give the current official window for my nationality, the official link, and whether my date is early enough. Also list any other scholarships for ${(WZ.routes||[]).map(k=>R[k].n.split(" · ")[0]).join(", ")||"my goal"} I should know about.`;
+  const done=()=>{document.getElementById("wz-copied").textContent="Copied. Paste it into a chat with web search.";};
+  try{navigator.clipboard.writeText(txt).then(done,()=>{wzFallbackCopy(txt); done();});}catch(e){wzFallbackCopy(txt); done();}
+}
+function wzFallbackCopy(t){const a=document.createElement("textarea"); a.value=t; document.body.appendChild(a); a.select(); try{document.execCommand("copy");}catch(e){} a.remove();}
+async function wzBuild(){
+  const p=wzPlan(), c=wzBuildCustom(p);
+  const box=document.getElementById("wz"), b=document.getElementById("wz-build"), log=document.getElementById("wz-log"); box.hidden=true; b.hidden=false; log.innerHTML="";
+  const steps=["Reading your answers",`Matching ${WZ.goal==="abroad"?(WZ.routes||[]).length+" route(s) to official application windows":"your goal to the right routes"}`,`Scheduling ${p.phases.length} phases around ${(WZ.exams||[]).length} exam month(s)`,`Re-dating ${ITEMS.length} projects and milestones`,`Writing your daily plan: ${+WZ.hours} h a week`,`Sorting ${p.buy.length} parts to buy by the month you need them`,"Saving"];
+  for(const s of steps){const li=document.createElement("li"); li.textContent=s; log.appendChild(li); await new Promise(r=>setTimeout(r,REDUCE?60:420)); li.classList.add("ok");}
+  // progress: mark what they already know as skipped; parts rebuilt
+  const lvl=+WZ.level||0, skipK=["p1","p1b","p2","p3"].slice(0,lvl);
+  ITEMS.forEach(it=>{ if(skipK.includes(it.phase)&&st(it.id)===0) prog[it.id]=Object.assign({status:0,review:0,notes:""},prog[it.id],{status:3,u:Date.now()}); });
+  [["py","L1"],["cpp","L2"],["la","L3"]].forEach(([k,id])=>{ if((WZ.knows||[]).includes(k)&&BY[id]&&st(id)===0) prog[id]=Object.assign({status:0,review:0,notes:""},prog[id],{status:3,u:Date.now()}); });
+  saveLocal(); if(mode==="db"&&store&&canWrite) Object.keys(prog).forEach(id=>store.doc("progress/"+id).set({status:prog[id].status,review:prog[id].review,notes:prog[id].notes||"",updated:new Date().toISOString()}).catch(()=>{}));
+  const due=Object.fromEntries(Object.entries(c.items).filter(([,v])=>v&&v.due).map(([k,v])=>[k,v.due]));
+  parts={inv:p.inv.map((r,i)=>({id:"i"+i,name:r[0],qty:r[1],cat:r[2],note:r[3]})),buy:p.buy.map((r,i)=>{const first=String(r[2]).match(/[A-Z]+\d+/); const dd=first&&due[first[0]]; return {id:"b"+i,seq:i,name:r[0],qty:r[1],for:r[2],by:dd?iso(addDays(d(dd),-14)).slice(0,7):r[3],lo:r[4],hi:r[5],note:r[6],cat:r[7]};})};
+  savePartsSoon();
+  saveCustom(c,"Your journal is built. Everything below can still be edited.","home");
+}
+(function wireWizard(){
+  if(!HAS_WIZ){const b=document.getElementById("cs-wizbox"); if(b) b.hidden=true; return;}
+  document.getElementById("wz-next").addEventListener("click",()=>{wzRead(); const e=wzValid(); if(e){document.getElementById("wz-err").textContent=e; return;} if(wzStep===WZSTEPS.length-1){wzBuild(); return;} wzStep++; wzRender(); document.getElementById("wz").scrollIntoView({behavior:REDUCE?"auto":"smooth",block:"start"});});
+  document.getElementById("wz-back").addEventListener("click",()=>{wzRead(); wzStep=Math.max(0,wzStep-1); wzRender();});
+  document.getElementById("wz-steps").addEventListener("click",e=>{const li=e.target.closest("li"); if(!li) return; const i=[...li.parentNode.children].indexOf(li); if(i<wzStep){wzRead(); wzStep=i; wzRender();}});
+  wzRender();
+})();
 
 renderLearn(); renderCred(); renderPort(); renderCommunity(); renderAll(); paintToggle();
 let startView="home"; try{if(sessionStorage.getItem(PROFILE.key+"-goto")){startView=sessionStorage.getItem(PROFILE.key+"-goto"); sessionStorage.removeItem(PROFILE.key+"-goto");}}catch(e){}
