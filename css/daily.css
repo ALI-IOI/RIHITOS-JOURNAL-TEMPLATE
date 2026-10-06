@@ -267,3 +267,6 @@ fieldset.wz-f>.wz-chip{display:flex;margin-bottom:6px}
 @media (max-width:900px){.ib-main{grid-template-columns:1fr}}
 @media (max-width:560px){.ib-it{grid-template-columns:auto minmax(0,1fr) auto}.ib-it .ib-when{display:none}}
 .veil.run{animation:none!important}
+/* home cards: the picture sits in the space between the name and the moves, never under the text */
+.bw .bw-art{left:8%;right:8%;opacity:.45}
+.bw .bw-art svg{width:100%;height:100%;max-height:100%}

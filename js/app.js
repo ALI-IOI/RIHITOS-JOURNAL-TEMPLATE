@@ -303,7 +303,9 @@ function renderLx(){
   el("lx-c2").textContent=pct+"%"; el("lx-c2b").style.width=Math.max(pct,2)+"%";
 }
 const H={inbox:()=>ibUnread(),streak:()=>dailyStreak(),todayPct:()=>pctOf(today)??0,weekPct:()=>weekPct(),daysTo:s=>daysTo(s),curPhase:()=>curPhase(),monthsTo:s=>monthsTo(s),nextOpen:l=>nextOpen(l),st:id=>st(id),rv:id=>rv(id),countable:it=>countable(it),parts:()=>parts,sortedBuy:()=>sortedBuy(),fmtMon:m=>fmtMon(m)};
-function renderDeck(){
+function bwFit(){document.querySelectorAll("#deck .bw").forEach(c=>{const art=c.querySelector(".bw-art"), nm=c.querySelector(".bw-name"), mv=c.querySelector(".bw-moves"), body=c.querySelector(".bw-body"); if(!art||!nm||!mv||!body) return; const pad=Math.max(6,c.offsetHeight*.015), top=body.offsetTop+nm.offsetTop+nm.offsetHeight+pad, bot=body.offsetTop+mv.offsetTop-pad, h=bot-top; art.style.top=top+"px"; art.style.height=Math.max(0,h)+"px"; art.style.bottom="auto"; art.style.visibility=h<28?"hidden":"";});}
+addEventListener("resize",()=>requestAnimationFrame(bwFit)); try{document.fonts&&document.fonts.ready.then(()=>bwFit());}catch(e){}
+function renderDeck(){ requestAnimationFrame(bwFit);
   renderLx();
   const host=document.getElementById("deck"); if(!host) return;
   host.innerHTML=DECK.map((c,i)=>{const [sl,sv]=c.st(H); const cost=n=>`<span class="bw-cost">${"<i></i>".repeat(n)}</span>`;
