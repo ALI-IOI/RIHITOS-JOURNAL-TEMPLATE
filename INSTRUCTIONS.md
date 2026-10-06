@@ -111,7 +111,7 @@ The page reloads after each save. To undo all of it, use **Backup → Reset cons
   **Review** column. This is what makes the learning stick.
 - **Parts.** Keep your inventory and shopping list here; search finds anything in both.
 - **Home.** Scroll or swipe to flip through the cards; click one to jump to that page.
-- **Background.** A 5-minute animated flight loops behind every page. To change it on one device: **Console → Backup → Background animation** (loop everywhere, loop on home only, or plain).
+- **Background.** One 5-minute animated flight loops behind the whole site. It follows the clock, so it carries on exactly where it was when you switch pages or reload. To change it on one device: **Console → Backup → Background animation** (loop everywhere, loop on home only, or plain).
 
 Your progress saves automatically in the browser you are using.
 

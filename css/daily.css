@@ -266,3 +266,4 @@ fieldset.wz-f>.wz-chip{display:flex;margin-bottom:6px}
 .tag.mine{background:color-mix(in srgb,var(--good) 22%,transparent);color:var(--good);border-color:color-mix(in srgb,var(--good) 50%,transparent)}
 @media (max-width:900px){.ib-main{grid-template-columns:1fr}}
 @media (max-width:560px){.ib-it{grid-template-columns:auto minmax(0,1fr) auto}.ib-it .ib-when{display:none}}
+.veil.run{animation:none!important}

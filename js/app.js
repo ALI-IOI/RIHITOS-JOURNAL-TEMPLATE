@@ -539,10 +539,12 @@ scene=(function(){
   function resize(){const w=innerWidth,h=innerHeight; renderer.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix(); if(reduce) draw();}
   const camPos=new THREE.Vector3(), look=new THREE.Vector3(), up=new THREE.Vector3(0,1,0);
   let lastSY=window.scrollY, vel=0, spS=0;
+  const sm={off:-.33,df:1};
   function place(dt){
+    sm.df+=((onHome?1:1.15)-sm.df)*Math.min(1,dt*2.2);
     const maxS=Math.max(1,document.documentElement.scrollHeight-innerHeight), sp=Math.min(1,Math.max(0,window.scrollY/maxS));
     const loop=loopMode; let u=0, wrapped=false;
-    if(loop){u=(clock%LOOP)/LOOP; loopU=u; wrapped=false; lastU=u; spS=u;} else spS+=(sp-spS)*(reduce?1:Math.min(1,dt*4));
+    if(loop){u=((Date.now()/1000)%LOOP)/LOOP; loopU=u; wrapped=false; lastU=u; spS=u;} else spS+=(sp-spS)*(reduce?1:Math.min(1,dt*4));
     const dy=window.scrollY-lastSY; lastSY=window.scrollY; vel+=((dt>0?dy/dt:0)-vel)*Math.min(1,dt*6); const v=loop?Math.sin(u*Math.PI*6)*.25:Math.max(-1,Math.min(1,vel/2500));
     // scroll flies the drone along its path: the home page spans the whole route, other pages a stretch around their waypoint
     const ez=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2, back=loop&&u>=.54;
@@ -559,11 +561,11 @@ scene=(function(){
     const SH=[[l=>-.35+l*Math.PI,10,4],[l=>Math.PI/2,9,3],[l=>0,22,7],[l=>l*Math.PI*.8,14,16],[l=>Math.PI*.2+l*Math.PI*1.2,18,9],[l=>-Math.PI/2,9,-.5],[l=>-Math.PI/2,9,3],[l=>l*Math.PI*2,12,5],[l=>Math.PI/4,26,12],[l=>Math.PI*(1-.35/Math.PI)+l*.0,9,2.5]];
     const shot=(k,l)=>{const s=SH[(k+10)%10]; return [s[0](l),s[1],s[2]];};
     let la=0,ld=10,lh=4; if(loop){const k=Math.floor(u*10), l=u*10-k, cur=shot(k,l), nx=shot(k+1,0), b=l>.82?(l-.82)/.18:0, sb=b*b*(3-2*b); la=cur[0]+(nx[0]-cur[0])*sb; ld=cur[1]+(nx[1]-cur[1])*sb; lh=cur[2]+(nx[2]-cur[2])*sb;}
-    const a=loop?la:spS*Math.PI*1.1-.35, near=!loop&&roam&&window.scrollY<innerHeight*.8?1:0, dist=(loop?ld*(onHome?1:1.15):near?8:15)*(innerWidth<innerHeight?1.7:innerWidth<900?1.3:1);
+    const a=loop?la:spS*Math.PI*1.1-.35, near=!loop&&roam&&window.scrollY<innerHeight*.8?1:0, dist=(loop?ld*sm.df:near?8:15)*(innerWidth<innerHeight?1.7:innerWidth<900?1.3:1);
     const dir=side.clone().multiplyScalar(Math.cos(a)).addScaledVector(tan,-Math.sin(a)).normalize();
     camPos.copy(p).addScaledVector(dir,dist); camPos.y+=(loop?lh:(near?2.5:5)+Math.sin(spS*Math.PI)*6)-mouse.y*4; camPos.addScaledVector(tan,mouse.x*5);
     drone.scale.setScalar(drone.scale.x+((loop&&onHome?1.6:1.3)-drone.scale.x)*Math.min(1,dt*2));
-    if(loop&&onHome) cam.setViewOffset(innerWidth,innerHeight,0,-innerHeight*.33,innerWidth,innerHeight); else if(cam.view&&cam.view.enabled) cam.clearViewOffset();
+    sm.off+=(((loop&&onHome)?-.33:0)-sm.off)*Math.min(1,dt*2.2); if(Math.abs(sm.off)>.001) cam.setViewOffset(innerWidth,innerHeight,0,innerHeight*sm.off,innerWidth,innerHeight); else if(cam.view&&cam.view.enabled) cam.clearViewOffset();
     
     if(reduce||wrapped){cam.position.copy(camPos); look.copy(p);} else {cam.position.lerp(camPos,Math.min(1,dt*1.8)); look.lerp(p,Math.min(1,dt*2.2));}
     cam.lookAt(look);
