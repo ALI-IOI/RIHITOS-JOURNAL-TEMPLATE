@@ -347,7 +347,7 @@ function hmTick(){
     document.getElementById("hm-count").textContent=String(best+1).padStart(2,"0")+" / "+String(DECK.length).padStart(2,"0");
     document.getElementById("hm-prog").style.width=(HM.max?HM.x/HM.max*100:0).toFixed(1)+"%";
   }
-  const u=scene.loopU?scene.loopU():0, sec=Math.floor(u*300); document.getElementById("hm-loop").textContent=`${Math.floor(sec/60)}:${String(sec%60).padStart(2,"0")} / 5:00`;
+  
   HM.raf=requestAnimationFrame(hmTick);
 }
 const hmPush=dv=>{if(!HM.on||!HM.dealt) return; hmMeasure(); HM.tx=Math.min(HM.max,Math.max(0,HM.tx+dv));};
@@ -508,6 +508,8 @@ scene=(function(){
   const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(-82,4,0),...P,new THREE.Vector3(82,10,0)]);
   const pathMat=new THREE.LineDashedMaterial({dashSize:1.2,gapSize:.9,transparent:true,opacity:.5});
   const path=new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(600)),pathMat); path.computeLineDistances(); S.add(path);
+  const loopCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(-82,4,0),...P,new THREE.Vector3(82,10,0),new THREE.Vector3(98,14,-14),new THREE.Vector3(72,20,-30),new THREE.Vector3(30,17,-36),new THREE.Vector3(-12,22,-32),new THREE.Vector3(-52,15,-36),new THREE.Vector3(-90,11,-24),new THREE.Vector3(-100,7,-9)],true,"centripetal");
+  const retPts=loopCurve.getSpacedPoints(900).filter(v=>v.z<-6||v.x>84||v.x<-84); const retPath=new THREE.Line(new THREE.BufferGeometry().setFromPoints(retPts),new THREE.LineDashedMaterial({dashSize:.8,gapSize:1.4,transparent:true,opacity:.22})); retPath.computeLineDistances(); S.add(retPath);
   const ringVars=["--accent","--blue","--good","--crit","--accent","--blue","--good"];
   const rings=P.map((p,i)=>{const g=new THREE.Group(); const m=new THREE.MeshBasicMaterial({transparent:true,opacity:.85}); const m2=new THREE.MeshBasicMaterial({transparent:true,opacity:.3});
     g.add(new THREE.Mesh(new THREE.TorusGeometry(3.2,.08,8,80),m), new THREE.Mesh(new THREE.TorusGeometry(3.9,.03,6,80),m2));
@@ -547,18 +549,18 @@ scene=(function(){
     if(loop){u=((Date.now()/1000)%LOOP)/LOOP; loopU=u; wrapped=false; lastU=u; spS=u;} else spS+=(sp-spS)*(reduce?1:Math.min(1,dt*4));
     const dy=window.scrollY-lastSY; lastSY=window.scrollY; vel+=((dt>0?dy/dt:0)-vel)*Math.min(1,dt*6); const v=loop?Math.sin(u*Math.PI*6)*.25:Math.max(-1,Math.min(1,vel/2500));
     // scroll flies the drone along its path: the home page spans the whole route, other pages a stretch around their waypoint
-    const ez=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2, back=loop&&u>=.54;
-    if(loop){targetT=u<.46?.03+.94*ez(u/.46):u<.54?.97-Math.sin((u-.46)/.08*Math.PI)*.012:.97-.94*ez((u-.54)/.46); t=targetT;}
+    const back=false;
+    if(loop){}
     else if(roam) targetT=Math.max(.04,home-.06)+spS*Math.min(.9,.95-home+.06)+(reduce?0:Math.sin(clock*.6)*.015);
     else targetT=VIEWT[currentViewKey]+(spS-.5)*.14;
     boost=Math.max(0,boost-dt*.7); const ease=1.6+boost*2.6; if(!loop) t+=(targetT-t)*(reduce?1:Math.min(1,dt*ease)); t=Math.min(.985,Math.max(.015,t));
-    const p=curve.getPointAt(t), tan=curve.getTangentAt(t);
+    const p=loop?loopCurve.getPointAt(u):curve.getPointAt(t), tan=loop?loopCurve.getTangentAt(u):curve.getTangentAt(t);
     drone.position.copy(p); drone.position.y+=Math.sin(clock*3)*.15;
     const fw=back?-1:1; drone.lookAt(p.clone().add(new THREE.Vector3(tan.x*fw,0,tan.z*fw))); drone.rotateZ(-tan.y*.6*fw); drone.rotateX(v*.45);
     const side=new THREE.Vector3().crossVectors(tan,up).normalize();
     // camera orbits the drone as you scroll
     // ten 30-second shots, blended at the joins: orbit, chase, side track, crane, hover reveal, low front, return chase, fast orbit, wide high, close side
-    const SH=[[l=>-.35+l*Math.PI,10,4],[l=>Math.PI/2,9,3],[l=>0,22,7],[l=>l*Math.PI*.8,14,16],[l=>Math.PI*.2+l*Math.PI*1.2,18,9],[l=>-Math.PI/2,9,-.5],[l=>-Math.PI/2,9,3],[l=>l*Math.PI*2,12,5],[l=>Math.PI/4,26,12],[l=>Math.PI*(1-.35/Math.PI)+l*.0,9,2.5]];
+    const SH=[[l=>-.35+l*Math.PI,10,4],[l=>Math.PI/2,9,3],[l=>0,22,7],[l=>l*Math.PI*.8,14,16],[l=>Math.PI*.2+l*Math.PI*1.2,18,9],[l=>-Math.PI/2,9,-.5],[l=>Math.PI/2,10,4],[l=>l*Math.PI*2,12,5],[l=>Math.PI/4,26,12],[l=>Math.PI*(1-.35/Math.PI)+l*.0,9,2.5]];
     const shot=(k,l)=>{const s=SH[(k+10)%10]; return [s[0](l),s[1],s[2]];};
     let la=0,ld=10,lh=4; if(loop){const k=Math.floor(u*10), l=u*10-k, cur=shot(k,l), nx=shot(k+1,0), b=l>.82?(l-.82)/.18:0, sb=b*b*(3-2*b); la=cur[0]+(nx[0]-cur[0])*sb; ld=cur[1]+(nx[1]-cur[1])*sb; lh=cur[2]+(nx[2]-cur[2])*sb;}
     const a=loop?la:spS*Math.PI*1.1-.35, near=!loop&&roam&&window.scrollY<innerHeight*.8?1:0, dist=(loop?ld*sm.df:near?8:15)*(innerWidth<innerHeight?1.7:innerWidth<900?1.3:1);
@@ -571,7 +573,7 @@ scene=(function(){
     cam.lookAt(look);
     // depth layers move at different speeds
     pts.position.y=-spS*30; pts.position.x=-spS*20; grid.position.z=(spS*60)%4; grid.position.y=-6-spS*3;
-    rings.forEach((r,i)=>{const rt=(i+1)/(P.length+1), pass=loop?Math.max(0,1-Math.abs(t-rt)*14):0; r.g.rotation.z=(loop?clock*.15:spS*Math.PI)*(i%2?1:-1)*.6; r.g.scale.setScalar((i===curIdx&&!reduce?1+Math.sin(clock*4)*.05:1)+pass*.35); r.m.opacity=Math.min(1,(i===curIdx?1:.65)+pass);});
+    rings.forEach((r,i)=>{const pass=loop?Math.max(0,1-r.g.position.distanceTo(p)/9):0; r.g.rotation.z=(loop?clock*.15:spS*Math.PI)*(i%2?1:-1)*.6; r.g.scale.setScalar((i===curIdx&&!reduce?1+Math.sin(clock*4)*.05:1)+pass*.35); r.m.opacity=Math.min(1,(i===curIdx?1:.65)+pass);});
   }
   const draw=()=>renderer.render(S,cam);
   if(reduce) addEventListener("scroll",()=>{place(1);draw();},{passive:true});
