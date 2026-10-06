@@ -291,7 +291,9 @@ function renderLx(){
   LX.forEach(([lbl,k],i)=>{if(el("lx-n"+(i+1))){el("lx-n"+(i+1)).textContent=PH[k]?pr(k):""; el("lx-l"+(i+1)).textContent=lbl;}});
   const cur=curPhase(), ix=MAIN.indexOf(cur);
   el("lx-phname").textContent=cur.name;
-  el("lx-seg").innerHTML=MAIN.map((p,k)=>`<i class="${k<ix?"past":k===ix?"on":""}" title="${esc(p.code+" "+p.name)}"></i>`).join("");
+  const phPct=p=>{const its=phaseItems(p.k).filter(countable); return its.length?Math.round(its.filter(i=>st(i.id)===2).length/its.length*100):0;}, tPct=p=>Math.max(0,Math.min(100,Math.round((today-d(p.start))/(d(p.end)-d(p.start))*100)));
+  el("lx-seg").innerHTML=MAIN.map((p,k)=>{const f=phPct(p), t=tPct(p); return `<i class="${k<ix?"past":k===ix?"on":""}" title="${esc(p.code+" "+p.name)}: ${f}% done, ${t}% of the time used" style="--f:${f}%;--t:${t}%"><b></b>${k===ix?"<u></u>":""}</i>`;}).join("");
+  {const c=MAIN[ix]; el("lx-phname").textContent=`${cur.name} · ${phPct(c)}% done`;}
   el("lx-capnow").innerHTML=(d(cur.start)>today?"Next":"Now")+` · <b>${esc(cur.code)} ${esc(cur.name)}</b>`;
   const nh=HARD.find(h=>h[2]&&d(h[2])>=today); if(nh){el("lx-c1").textContent=nh[1]; el("lx-c1s").textContent=`${daysTo(nh[2])} days · ${nh[0]}`;}
   const counted=ITEMS.filter(countable), dn=counted.filter(i=>st(i.id)===2).length, pct=counted.length?Math.round(dn/counted.length*100):0;
@@ -850,6 +852,7 @@ function dbHook(db){
 function dailyStreak(){let n=0; for(let dt=new Date(today);;dt=addDays(dt,-1)){if(hoursOf(iso(dt))>0) n++; else if(+dt!==+today) break; if(n>3660) break;} return n;}
 function weekPct(){const w=weekStartOf(today); let th=0,tt=0; for(let j=0;j<7;j++){const dt=addDays(w,j); th+=hoursOf(iso(dt)); tt+=targetOf(dt);} return tt?Math.round(th/tt*100):0;}
 renderConsole();
+if(window.claude&&claude.use){["cs-sync","cs-data"].forEach(id=>{const el=document.getElementById(id); if(el) el.innerHTML=id==="cs-sync"?'<h2>Sync</h2><p class="cs-note">This copy runs on claude.ai and already syncs through your account. Gist sync and backups are available in the GitHub version.</p>':'';}); const d=document.getElementById("cs-data"); if(d) d.hidden=true;}
 window.__J={ITEMS,PHASES,RES,BOOKS,HARD,COUNTDOWNS,DAILY,PROFILE,TEXT,get daily(){return daily;},get prog(){return prog;},bundle,mergeBundle};
 
 renderLearn(); renderCred(); renderPort(); renderCommunity(); renderAll(); paintToggle();

@@ -162,3 +162,17 @@ label.cs-chk{flex-direction:row;align-items:center;gap:6px;padding-bottom:10px}
 .cs-line.cs-ar{grid-template-columns:minmax(0,1fr) 64px 36px}
 .list-row .t{min-width:0;overflow:hidden}.list-row .t .star{display:inline}
 .tool-grid .tool{min-width:0}.tool-grid .tool b{overflow-wrap:anywhere}
+/* home stage: phase segments show real progress (dim fill = time used, bright fill = items done) */
+.lx-seg{align-items:center}
+.lx-seg i{position:relative;overflow:hidden;color:#05d9e8;transition:width .6s}
+.lx-seg i.past{background:rgba(5,217,232,.35)!important}
+.lx-seg i.on{width:72px!important;height:6px!important;background:rgba(255,42,109,.16)!important;box-shadow:0 0 0 1px rgba(255,42,109,.55),0 0 10px rgba(255,42,109,.45)!important;color:#ff2a6d}
+.lx-seg i.on u{position:absolute;inset:0 auto 0 0;width:var(--t,0%);background:rgba(255,42,109,.35);text-decoration:none}
+.lx-seg i b{position:absolute;inset:0 auto 0 0;width:var(--f,0%);background:currentColor;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.lx-seg i.on::after{content:"";position:absolute;top:0;bottom:0;width:18px;left:-20px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);animation:lxScan 2.6s linear infinite}
+@keyframes lxScan{to{left:100%}}
+:root[data-theme="light"] .lx-seg i{color:#0091b3}
+:root[data-theme="light"] .lx-seg i.past{background:rgba(0,145,179,.35)!important}
+:root[data-theme="light"] .lx-seg i.on{background:rgba(212,0,90,.12)!important;box-shadow:0 0 0 1px rgba(212,0,90,.5)!important;color:#d4005a}
+:root[data-theme="light"] .lx-seg i.on u{background:rgba(212,0,90,.28)}
+@media (prefers-reduced-motion:reduce){.lx-seg i b{transition:none}.lx-seg i.on::after{animation:none;display:none}}
