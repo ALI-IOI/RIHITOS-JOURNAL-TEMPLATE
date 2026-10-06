@@ -27,6 +27,15 @@
         else if (patch.title && patch.phase) ITEMS.push(Object.assign({ id, target: "", due: PROFILE.end, star: false, desc: "" }, patch));
       });
     }
+    if (obj(C.learn) && typeof WIZARD !== "undefined" && Array.isArray(WIZARD.learn)) {
+      const pats = WIZARD.learn.filter(x => (C.learn.platforms || []).includes(x[0])).map(x => new RegExp(x[2], "i"));
+      RES.forEach(r => { r.mine = pats.some(re => re.test(r.url)); });
+      RES.sort((a, b) => (b.mine ? 1 : 0) - (a.mine ? 1 : 0));
+      const score = u => { const v = /youtube|videos|lecture/i.test(u), rd = /docs\.|documentation|book|\.pdf|fbswiki|lavalle|tutorial/i.test(u), bd = /github|project|instructables|randomnerd|examples/i.test(u);
+        return C.learn.style === "video" ? (v ? 0 : 1) : C.learn.style === "read" ? (rd ? 0 : 1) : (bd ? 0 : 1); };
+      Object.keys(LINKS).forEach(k => { const l = LINKS[k]; if (Array.isArray(l)) LINKS[k] = l.slice().sort((a, b) => score(a[1]) - score(b[1]) || (pats.some(re => re.test(b[1])) ? 1 : 0) - (pats.some(re => re.test(a[1])) ? 1 : 0)); });
+      if (C.learn.paid === "free") { const b = document.getElementById("l-free"); if (b) b.setAttribute("aria-pressed", "true"); }
+    }
   } catch (e) { console.warn("Console edits could not be applied", e); }
   document.title = PROFILE.title || document.title;
 })();

@@ -70,7 +70,7 @@
         <span class="hm-hint"><i aria-hidden="true"></i>Scroll to browse</span>
         <span class="hm-count" id="hm-count">01 / 12</span>
         <span class="hm-prog" aria-hidden="true"><i id="hm-prog"></i></span>
-        <span class="hm-loop" title="Background loop"><b aria-hidden="true">▶</b><span id="hm-loop">0:00 / 0:30</span></span>
+        <span class="hm-loop" title="Background loop"><b aria-hidden="true">▶</b><span id="hm-loop">0:00 / 5:00</span></span>
       </div>
     </div>
   </section>
@@ -132,7 +132,7 @@
   </section>
 
   <section class="view" id="view-start" hidden>
-    <div class="view-head"><div class="eyebrow">Start your journey · 6 short steps</div><h1>Start</h1><p>Answer a few questions about you, your timeline and where you want to go. The journal then rebuilds itself around you: phases, deadlines, exams, countdowns, your daily plan and your parts list.</p></div>
+    <div class="view-head"><div class="eyebrow">Start your journey · 7 short steps</div><h1>Start</h1><p>Answer a few questions about you, your timeline and where you want to go. The journal then rebuilds itself around you: phases, deadlines, exams, countdowns, your daily plan and your parts list.</p></div>
     <div class="wz glass" id="wz">
       <ol class="wz-steps" id="wz-steps" aria-label="Steps"></ol>
       <form class="wz-body" id="wz-form" novalidate></form>
@@ -143,6 +143,27 @@
       </div>
     </div>
     <div class="wz-build glass" id="wz-build" hidden><h2>Building your journal</h2><ul id="wz-log"></ul></div>
+  </section>
+  <section class="view" id="view-inbox" hidden>
+    <div class="view-head"><div class="eyebrow">Inbox · optional connections</div><h1>Inbox</h1><p>Starred mail, GitHub notifications, Reddit messages and saved posts, plus links you pin yourself, in one list. Every connection is off until you turn it on, stays on this device only, and can be removed with one click.</p></div>
+    <div class="ib-src" id="ib-src"></div>
+    <div class="ib-main">
+      <div class="ib-feed glass">
+        <div class="dl-chart-h"><div><h2>What needs you</h2><small id="ib-sub">Nothing connected yet</small></div>
+          <div class="ib-tools"><div class="dl-seg" id="ib-filter" role="tablist" aria-label="Filter"></div><button type="button" class="dl-btn" id="ib-refresh">↻ Refresh</button></div></div>
+        <ul class="ib-list" id="ib-list"></ul>
+      </div>
+      <aside class="ib-side">
+        <form class="glass ib-pins" id="ib-pinform"><h2>Pin something</h2><p class="cs-note">An email you need to answer, a post to read, a deadline from anywhere: paste the link and it stays here (and syncs with your Gist).</p>
+          <label>Title<input id="ib-pt" required maxlength="140" placeholder="e.g. Reply to Prof. Tanaka"></label>
+          <label>Link<input id="ib-pu" type="text" inputmode="url" autocomplete="off" placeholder="https://…"></label>
+          <div class="cs-line" style="border:0;padding:0;grid-template-columns:1fr 1fr"><label>Due<input id="ib-pd" type="date"></label><label>From<select id="ib-ps"><option>Email</option><option>LinkedIn</option><option>GitHub</option><option>Reddit</option><option>Discord</option><option>X</option><option>YouTube</option><option>Other</option></select></label></div>
+          <div class="cs-act"><button class="btn-pill" type="submit">Pin it</button></div></form>
+        <div class="glass ib-quick"><div class="ib-qh"><h2>Quick links</h2><button type="button" class="dl-btn" id="ib-qedit">Edit</button></div>
+          <p class="cs-note">LinkedIn, X, Instagram, Facebook and Discord can't be read from a page like this, so they open in a new tab.</p>
+          <div class="ib-qgrid" id="ib-qgrid"></div><div id="ib-qform" hidden></div></div>
+      </aside>
+    </div>
   </section>
   <section class="view" id="view-daily" hidden>
     <div class="view-head"><div class="eyebrow">Daily log · time blocks</div><h1>Daily</h1><p>Tick each block you actually worked. Squares fill with the activity's colour, the table on the right turns the day into a score, and the graph paper joins the dots.</p></div>
@@ -194,7 +215,7 @@
         <p class="cs-status" id="cs-gstat"></p></div>
       <div class="cs-card glass" id="cs-data"><h2>Backup</h2><p class="cs-note">Everything (progress, notes, parts, daily log, console edits) as one JSON file.</p>
         <div class="cs-act"><button class="btn-ghost" type="button" id="cs-export">Export JSON</button><label class="btn-ghost cs-file">Import JSON<input type="file" id="cs-import" accept="application/json,.json" hidden></label></div>
-        <div class="cs-act" id="cs-wizbox" style="justify-content:flex-start"><button class="btn-ghost" type="button" data-go="start">Run “Start your journey” again</button></div><h3>Reset</h3><p class="cs-note">Removes console edits only, back to the data files. Progress is kept.</p><div class="cs-act"><button class="btn-ghost danger" type="button" id="cs-reset">Reset console edits</button></div>
+        <h3>Background animation</h3><p class="cs-note">This device only.</p><label>Mode<select id="cs-bg"><option value="loop">5-minute loop on every page</option><option value="scroll">Loop on home, scroll-driven elsewhere</option><option value="off">Home only, plain elsewhere</option></select></label><div class="cs-act" id="cs-wizbox" style="justify-content:flex-start"><button class="btn-ghost" type="button" data-go="start">Run “Start your journey” again</button></div><h3>Reset</h3><p class="cs-note">Removes console edits only, back to the data files. Progress is kept.</p><div class="cs-act"><button class="btn-ghost danger" type="button" id="cs-reset">Reset console edits</button></div>
         <p class="cs-status" id="cs-dstat"></p></div>
       <form class="cs-card glass cs-wide" id="cs-raw"><h2>Raw edits (advanced)</h2><p class="cs-note">The JSON the console writes. Keys: <code>profile</code>, <code>text</code>, <code>countdowns</code>, <code>hard</code>, <code>daily</code>, <code>phases</code>, <code>items</code> (an item set to <code>null</code> is deleted).</p><textarea id="cs-rawtxt" spellcheck="false" rows="12"></textarea><div class="cs-act"><button class="btn-pill" type="submit">Apply JSON</button></div></form>
     </div>

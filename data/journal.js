@@ -205,7 +205,14 @@ const RES=[
  R("research","Underactuated Robotics","Russ Tedrake · MIT","Course","Free",0,"Online textbook and lectures on control for walking and flying machines.","https://underactuated.mit.edu/","After Phase 4"),
  R("research","Robotic Manipulation","Russ Tedrake · MIT","Course","Free",0,"Perception, planning and control for robot arms, with notebooks.","https://manipulation.mit.edu/","Optional"),
  R("research","awesome-robotics","kiloreux · GitHub","List","Free",0,"A curated map of courses, books, simulators and libraries.","https://github.com/kiloreux/awesome-robotics","Any time"),
- R("research","arXiv cs.RO","arXiv","Papers","Free",0,"New robotics papers daily. Skim titles weekly from Phase 5.","https://arxiv.org/list/cs.RO/recent","Phase 5")
+ R("research","arXiv cs.RO","arXiv","Papers","Free",0,"New robotics papers daily. Skim titles weekly from Phase 5.","https://arxiv.org/list/cs.RO/recent","Phase 5"),
+ R("cpp","Introduction to CS and Programming in Python (6.0001)","MIT OpenCourseWare","Course","Free",0,"MIT's first programming course: lectures, problem sets and readings, all free.","https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/","Months 1–3"),
+ R("cpp","freeCodeCamp on YouTube","freeCodeCamp","Video","Free",0,"Full-length free courses on Python, C++, Linux, Git and more.","https://www.youtube.com/@freecodecamp","Any time"),
+ R("elec","Circuits and Electronics (6.002)","MIT OpenCourseWare","Course","Free",0,"The circuit theory behind every board you wire, with problem sets.","https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/","Phases 1–1b"),
+ R("elec","Electrical engineering","Khan Academy","Course","Free",0,"Short lessons on circuits and electronics, good for filling gaps.","https://www.khanacademy.org/science/electrical-engineering","Phase 1"),
+ R("math","Linear algebra","Khan Academy","Course","Free",0,"Vectors, matrices and transformations with practice exercises.","https://www.khanacademy.org/math/linear-algebra","Months 4–8"),
+ R("math","Differential Equations (18.03)","MIT OpenCourseWare","Course","Free",0,"The maths behind dynamics and control.","https://ocw.mit.edu/courses/18-03-differential-equations-spring-2010/","Months 6–9"),
+ R("math","Probabilistic Systems Analysis (6.041SC)","MIT OpenCourseWare","Course","Free",0,"Probability for estimation and SLAM, with recitation videos.","https://ocw.mit.edu/courses/6-041sc-probabilistic-systems-analysis-and-applied-probability-fall-2013/","Months 10–13")
 ];
 
 /* ---------- credentials ---------- */
@@ -373,14 +380,16 @@ const BUY0=[
 /* ---------- home cards ---------- */
 const CUSTOM_DONE=()=>{try{const c=JSON.parse(localStorage.getItem(KEY+"-custom")||"{}"); return !!(c&&c.wizard&&c.wizard.built);}catch(e){return false;}};
 const DECK=[
- {k:"start",n:"Start your journey",ty:"Setup",c:"#ff2a6d",holo:1,art:"flag",st:H=>CUSTOM_DONE()?["Built","✓"]:["Steps",6],
-  m:[["Answer",H=>"6","You, your timeline, level, focus, goal, time and tools."],["Rebuild",H=>CUSTOM_DONE()?"Done":"Go","Phases, deadlines, exams, daily plan and parts, made for you."]],w:["Guessing","Generic plans","5 min"],f:"Tell it where you're going. It redraws the whole map around you."},
+ {k:"start",n:"Start your journey",ty:"Setup",c:"#ff2a6d",holo:1,art:"flag",st:H=>CUSTOM_DONE()?["Built","✓"]:["Steps",7],
+  m:[["Answer",H=>"7","You, timeline, level, focus, time, learning and tools."],["Rebuild",H=>CUSTOM_DONE()?"Done":"Go","Phases, deadlines, exams, daily plan and parts, made for you."]],w:["Guessing","Generic plans","5 min"],f:"Tell it where you're going. It redraws the whole map around you."},
  {k:"mission",n:"Mission",ty:"Overview",c:"var(--accent)",holo:1,art:"drone",st:H=>["Days left",H.daysTo(PROFILE.end)],
   m:[["Gate check",H=>MAIN.length,"Seven phases, each closed by a project you finish or don't."],["Now playing",H=>H.curPhase().code.replace("PH ","P"),"The phase you're in and the gate that ends it."]],w:["Drift","Busy weeks","5 min"],f:"The whole climb, from a first circuit to a robot that maps a room."},
  {k:"tracker",n:"Tracker",ty:"Progress",c:"var(--blue)",holo:1,art:"check",st:H=>["Items",ITEMS.filter(H.countable).length],
   m:[["Mark it done",H=>ITEMS.filter(H.countable).filter(i=>H.st(i.id)===2).length,"Every project and milestone, with a status."],["Spaced review",H=>ITEMS.filter(i=>H.rv(i.id)>0).length,"Day 7 and Day 30 rebuilds, so nothing fades."]],w:["Skipped reviews","Forgetting","2 min/day"],f:"Fast learning sticks only when you pull it back out of memory."},
  {k:"daily",n:"Daily",ty:"Habit",c:"var(--good)",art:"cal",st:H=>["Streak",H.streak()+"d"],
   m:[["Today",H=>H.todayPct()+"%","Blocks ticked against today's target."],["This week",H=>H.weekPct()+"%","Hours logged against the weekly plan."]],w:["Blank days","Drift","1 min/day"],f:"Tick the blocks you worked. The line on the graph paper never lies."},
+ {k:"inbox",n:"Inbox",ty:"Signals",c:"var(--blue)",art:"mail",st:H=>["New",H.inbox()],
+  m:[["Pinned",H=>Object.keys(JSON.parse(localStorage.getItem(PROFILE.key+"-pins")||"{}")).length,"Links you pinned: a mail to answer, a post to read."],["Connected",H=>{try{const c=JSON.parse(localStorage.getItem(PROFILE.key+"-inbox")||"{}"); return ["gh","gm","rd"].filter(k=>c[k]&&c[k].token).length;}catch(e){return 0;}},"GitHub, Gmail and Reddit, only if you switch them on."]],w:["Notification noise","Missed mail","2 min/day"],f:"Only what you starred, pinned or were mentioned in. Nothing else gets through."},
  {k:"board",n:"Board",ty:"Flow",c:"var(--good)",art:"board",st:H=>["Active",ITEMS.filter(i=>H.st(i.id)===1).length],
   m:[["Up next",H=>{const n=H.nextOpen(ITEMS.filter(H.countable)); return n?n.id:"—";},"The next card to pull, by due date."],["Finish first",H=>ITEMS.filter(i=>H.st(i.id)===2).length,"Done beats started. Keep the middle column short."]],w:["Too much at once","Overwhelm","1 min"],f:"Three columns, one rule: finish before you start."},
  {k:"plan",n:"Plan",ty:"Strategy",c:"var(--crit)",art:"plan",st:H=>["Months",H.monthsTo(PROFILE.end)],
@@ -503,6 +512,8 @@ const WIZARD={
     general:{label:"Not sure yet",lx:"Robots",p4:"Pick a platform",p5:"Autonomy + research",
       items:{D1:["Try three platforms in simulation","A drone in PX4 SITL, an arm in MoveIt 2, a rover in Nav2. Keep notes.",[["PX4 simulation","https://docs.px4.io/main/en/simulation/"],["MoveIt 2 documentation","https://moveit.picknik.ai/main/index.html"],["Nav2 documentation","https://docs.nav2.org/"]]]}}
   },
+  // free platforms people can prefer; patterns match resource and link URLs
+  learn:[["ocw","MIT OpenCourseWare","ocw\\.mit\\.edu|underactuated\\.mit|manipulation\\.mit|vnav\\.mit|missing\\.csail"],["fcc","freeCodeCamp","freecodecamp"],["coursera","Coursera (free audit)","coursera\\.org"],["edx","edX / Harvard CS50","edx\\.org|cs50\\.harvard"],["khan","Khan Academy","khanacademy"],["yt","YouTube teachers","youtube\\.com|3blue1brown|mathworks\\.com/videos"],["docs","Official docs and tutorials","docs\\.|documentation|ros\\.org|px4\\.io|arduino\\.cc|espressif|opencv|nav2|python\\.org"],["books","Free textbooks","fbswiki|lavalle|mml-book|linuxcommand|git-scm\\.com/book|hades\\.mech|asrl\\.utias|udlbook"],["code","Code on GitHub","github\\.com"]],
   // what you already own → parts inventory
   owned:[["arduino","Arduino Uno or compatible","Boards"],["esp32","ESP32 dev board","Boards"],["pi","Raspberry Pi","Computers & cameras"],["sensors","Sensor kit (IMU, ultrasonic, light)","Sensors"],["motors","Motors and a motor driver","Motors & drivers"],["printer","3D printer (or access to one)","Tools"],["meter","Multimeter","Tools"],["drone","A small drone","Drone & flight"]],
   buyMap:{meter:["Digital multimeter"],motors:["TB6612FNG motor driver","Two-wheel robot chassis kit","Encoder gear motor pair"],sensors:["HC-SR04 ultrasonic sensor","MPU-6050 or BMI270 IMU breakout"],esp32:["ESP32 dev board"],pi:["Raspberry Pi + power supply + microSD","Pi camera module"],drone:["Small research drone or sub-250 g kit"]}

@@ -4,7 +4,7 @@ A personal learning tracker for anyone teaching themselves robotics, from a firs
 that map rooms and fly missions. Plain HTML, CSS and JavaScript: no build step, no server, no account.
 
 It ships with a demo learner ("IOI") and a 24-month roadmap. Press **Start your journey** on the home page and
-answer six steps; the journal rebuilds the whole plan around you. You can still edit any detail in the **Console**
+answer seven steps; the journal rebuilds the whole plan around you. You can still edit any detail in the **Console**
 or in one data file.
 
 **New here? Read [INSTRUCTIONS.md](INSTRUCTIONS.md)**: a step-by-step guide from copying the template to syncing your phone.
@@ -13,8 +13,9 @@ or in one data file.
 
 ## What's inside
 
-- **Start your journey** – six short questions (you, timeline, level, focus and goal, time, tools). The site then rebuilds itself around your answers: phases, every project date, scholarship and exam deadlines with official sources, countdowns, daily plan and parts list.
-- **Home** – a greeting and a deck of cards, one per section; scroll or swipe to browse.
+- **Start your journey** – seven short questions (you, timeline, level, focus and goal, time, learning, tools). The site then rebuilds itself around your answers: phases, every project date, scholarship and exam deadlines with official sources, countdowns, daily plan and parts list.
+- **Home** – a greeting and a deck of cards, one per section; scroll or swipe to browse. A 5-minute animated flight loops behind every page.
+- **Inbox** – optional: starred and important Gmail, GitHub notifications, Reddit messages and saved posts, links you pin yourself, and quick links to LinkedIn, X, Discord and more. Off until you connect each one; tokens stay on your device.
 - **Mission** – phases, gates, countdowns, deadlines and a build log.
 - **Tracker / Board** – every roadmap item with status, spaced-review state and notes.
 - **Daily** – a week of time blocks (30 min by default). Tick squares in an activity's colour; a side table
@@ -29,7 +30,7 @@ or in one data file.
 
 1. Click **Use this template** on GitHub (or download the ZIP).
 2. Open `index.html` in a browser, or publish it: **Settings → Pages → Deploy from a branch → `main` / root**.
-3. Click the first card, **Start your journey**, answer six steps and press **Build my journal**. Fine-tune anything later in **Console**.
+3. Click the first card, **Start your journey**, answer seven steps and press **Build my journal**. Fine-tune anything later in **Console**.
 
 Full walkthrough: [INSTRUCTIONS.md](INSTRUCTIONS.md).
 

@@ -58,7 +58,7 @@ function pillSelect(kind,id,val){const opts=(kind==="s"?STATUS:REVIEW).map((o,i)
 document.addEventListener("change",e=>{const el=e.target; if(el.matches("select.pill[data-id]")) write(el.dataset.id, el.dataset.kind==="s"?{status:+el.value}:{review:+el.value});});
 
 let scene={};
-const VIEWS=[["home","Home"],["mission","Mission"],["tracker","Tracker"],["daily","Daily"],["board","Board"],["plan","Plan"],["learn","Learn"],["books","Books"],["parts","Parts"],["cred","Credentials"],["skills","Skills"],["community","Community"],["port","Portfolio"],["apply","Apply"],["console","Console"]];
+const VIEWS=[["home","Home"],["mission","Mission"],["tracker","Tracker"],["daily","Daily"],["inbox","Inbox"],["board","Board"],["plan","Plan"],["learn","Learn"],["books","Books"],["parts","Parts"],["cred","Credentials"],["skills","Skills"],["community","Community"],["port","Portfolio"],["apply","Apply"],["console","Console"]];
 if(typeof WIZARD!=="undefined") VIEWS.splice(1,0,["start","Start"]);
 const nav=document.getElementById("nav"), onav=document.getElementById("overlay-nav"), overlay=document.getElementById("overlay");
 nav.innerHTML=VIEWS.map(([k,n])=>`<button class="tab" role="tab" id="tab-${k}" data-view="${k}" aria-selected="false">${n}</button>`).join("");
@@ -268,6 +268,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-pt]"); if(
   if(k==="bought"){const x=parts.buy.find(p=>p.id===id); if(!x) return; changeParts(()=>{parts.buy=parts.buy.filter(p=>p.id!==id); const d=new Date(); parts.inv.push({id:uidP("i"),name:x.name,qty:x.qty||1,cat:PCATS.includes(x.cat)?x.cat:"Other",note:"Bought "+fmtMon(d.toISOString().slice(0,7))+(x.for?" for "+x.for:"")}); if(ptEdit&&ptEdit.id===id) ptEdit=null;},`Moved “${x.name}” to inventory.`); return;}
 });
 const ART={
+ mail:'<svg viewBox="0 0 160 100"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="34" y="20" width="92" height="62" rx="6"/><path d="M34 26l46 32 46-32"/><circle cx="124" cy="22" r="9" fill="currentColor" stroke="none"/><path d="M34 76l30-22M126 76L96 54" opacity=".5"/></g></svg>',
  flag:'<svg viewBox="0 0 160 100"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 86 C50 70 60 40 92 34 S130 24 142 12" stroke-dasharray="4 6"/><circle cx="20" cy="86" r="5"/><path d="M138 40V8l18 7-18 7"/><circle cx="92" cy="34" r="3"/><circle cx="56" cy="62" r="3"/></g></svg>',
  cal:'<svg viewBox="0 0 160 100"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="30" y="14" width="100" height="76" rx="6"/><path d="M30 30h100" opacity=".7"/><path d="M44 8v12M116 8v12"/></g><g fill="currentColor"><rect x="40" y="38" width="10" height="10" rx="1.5"/><rect x="54" y="38" width="10" height="10" rx="1.5"/><rect x="68" y="52" width="10" height="10" rx="1.5"/><rect x="96" y="52" width="10" height="10" rx="1.5"/><rect x="54" y="66" width="10" height="10" rx="1.5"/><rect x="110" y="66" width="10" height="10" rx="1.5"/></g><g fill="none" stroke="currentColor" stroke-width="1" opacity=".35"><rect x="68" y="38" width="10" height="10"/><rect x="82" y="38" width="10" height="10"/><rect x="40" y="52" width="10" height="10"/><rect x="82" y="66" width="10" height="10"/></g></svg>',
  drone:'<svg viewBox="0 0 160 100"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M50 30l60 40M110 30l-60 40"/><rect x="68" y="40" width="24" height="20" rx="4"/><ellipse cx="50" cy="30" rx="20" ry="5"/><ellipse cx="110" cy="30" rx="20" ry="5"/><ellipse cx="50" cy="70" rx="20" ry="5"/><ellipse cx="110" cy="70" rx="20" ry="5"/><path d="M80 60v10M74 76h12" opacity=".6"/></g></svg>',
@@ -301,7 +302,7 @@ function renderLx(){
   const counted=ITEMS.filter(countable), dn=counted.filter(i=>st(i.id)===2).length, pct=counted.length?Math.round(dn/counted.length*100):0;
   el("lx-c2").textContent=pct+"%"; el("lx-c2b").style.width=Math.max(pct,2)+"%";
 }
-const H={streak:()=>dailyStreak(),todayPct:()=>pctOf(today)??0,weekPct:()=>weekPct(),daysTo:s=>daysTo(s),curPhase:()=>curPhase(),monthsTo:s=>monthsTo(s),nextOpen:l=>nextOpen(l),st:id=>st(id),rv:id=>rv(id),countable:it=>countable(it),parts:()=>parts,sortedBuy:()=>sortedBuy(),fmtMon:m=>fmtMon(m)};
+const H={inbox:()=>ibUnread(),streak:()=>dailyStreak(),todayPct:()=>pctOf(today)??0,weekPct:()=>weekPct(),daysTo:s=>daysTo(s),curPhase:()=>curPhase(),monthsTo:s=>monthsTo(s),nextOpen:l=>nextOpen(l),st:id=>st(id),rv:id=>rv(id),countable:it=>countable(it),parts:()=>parts,sortedBuy:()=>sortedBuy(),fmtMon:m=>fmtMon(m)};
 function renderDeck(){
   renderLx();
   const host=document.getElementById("deck"); if(!host) return;
@@ -346,7 +347,7 @@ function hmTick(){
     document.getElementById("hm-count").textContent=String(best+1).padStart(2,"0")+" / "+String(DECK.length).padStart(2,"0");
     document.getElementById("hm-prog").style.width=(HM.max?HM.x/HM.max*100:0).toFixed(1)+"%";
   }
-  const u=scene.loopU?scene.loopU():0, sec=Math.floor(u*30); document.getElementById("hm-loop").textContent=`0:${String(sec).padStart(2,"0")} / 0:30`;
+  const u=scene.loopU?scene.loopU():0, sec=Math.floor(u*300); document.getElementById("hm-loop").textContent=`${Math.floor(sec/60)}:${String(sec%60).padStart(2,"0")} / 5:00`;
   HM.raf=requestAnimationFrame(hmTick);
 }
 const hmPush=dv=>{if(!HM.on||!HM.dealt) return; hmMeasure(); HM.tx=Math.min(HM.max,Math.max(0,HM.tx+dv));};
@@ -361,7 +362,7 @@ addEventListener("resize",()=>{if(HM.on) hmMeasure();});
 
 function renderLearn(){
   const out=TRACKS.filter(t=>!lTrack.value||t.k===lTrack.value).map(t=>{const rs=RES.filter(r=>r.track===t.k&&(!on(lFree)||r.cost==="Free")&&(!on(lPaid)||r.cost==="Paid")&&(!on(lBest)||r.best)); if(!rs.length) return "";
-    return `<div class="res-group ph-${t.ph}"><h2>${esc(t.name)}</h2><p>${esc(t.lead)}</p><div class="res-grid">${rs.map(r=>`<article class="res glass ph-${t.ph}"><div class="tags">${r.best?'<span class="tag best">★ Best pick</span>':""}<span class="tag ${r.cost==="Free"?"free":"paid"}">${r.cost}</span><span class="tag">${esc(r.kind)}</span></div><h3><a href="${r.url}" target="_blank" rel="noopener">${esc(r.title)}</a></h3><div class="by">${esc(r.by)}</div><p>${esc(r.why)}</p><div class="when">${esc(r.when)}</div></article>`).join("")}</div></div>`;}).join("");
+    return `<div class="res-group ph-${t.ph}"><h2>${esc(t.name)}</h2><p>${esc(t.lead)}</p><div class="res-grid">${rs.map(r=>`<article class="res glass ph-${t.ph}"><div class="tags">${r.mine?'<span class="tag mine">For you</span>':""}${r.best?'<span class="tag best">★ Best pick</span>':""}<span class="tag ${r.cost==="Free"?"free":"paid"}">${r.cost}</span><span class="tag">${esc(r.kind)}</span></div><h3><a href="${r.url}" target="_blank" rel="noopener">${esc(r.title)}</a></h3><div class="by">${esc(r.by)}</div><p>${esc(r.why)}</p><div class="when">${esc(r.when)}</div></article>`).join("")}</div></div>`;}).join("");
   document.getElementById("learn").innerHTML=out||`<div class="note glass">No materials match these filters.</div>`;
 }
 
@@ -526,11 +527,14 @@ scene=(function(){
     rings.forEach(r=>{const c=col(r.v); r.m.color.copy(c); r.m2.color.copy(c);});
     const dark=currentTheme()==="dark"; pm.opacity=dark?.6:.35; pathMat.opacity=dark?.5:.42; grid.material.opacity=dark?.16:.24; if(reduce) draw();};
   const curIdx=(()=>{const i=MAIN.findIndex(p=>d(p.start)<=today&&today<=d(p.end)); if(i>=0) return i; const n=MAIN.findIndex(p=>d(p.start)>today); return n<0?6:n;})();
-  const VIEWT={start:.06,daily:.23,console:.97,tracker:.18,board:.28,plan:.38,learn:.48,books:.515,parts:.545,cred:.575,skills:.66,community:.74,port:.83,apply:.93};
+  const VIEWT={inbox:.25,start:.06,daily:.23,console:.97,tracker:.18,board:.28,plan:.38,learn:.48,books:.515,parts:.545,cred:.575,skills:.66,community:.74,port:.83,apply:.93};
   const home=(curIdx+1)/(P.length+1);
   let targetT=home, t=home, roam=true, clock=0;
-  let boost=0, currentViewKey="home", loopMode=true, lastU=0, loopU=0; const LOOP=30;
-  api.loopU=()=>loopU; api.setView=v=>{currentViewKey=v; roam=v==="mission"; loopMode=v==="home"; if(!loopMode) canvas.style.opacity=""; targetT=roam?home:loopMode?t:VIEWT[v]; boost=1; if(reduce){t=targetT; place(1); draw();}};
+  let boost=0, currentViewKey="home", lastU=0, loopU=0; const LOOP=300;
+  const BG=()=>{let m=PROFILE.bg||"loop"; try{m=localStorage.getItem(PROFILE.key+"-bg")||m;}catch(e){} return m;};
+  let loopMode=true, onHome=true;
+  api.bgMode=BG;
+  api.loopU=()=>loopU; api.setView=v=>{currentViewKey=v; onHome=v==="home"; roam=v==="mission"; loopMode=onHome||BG()==="loop"; canvas.style.opacity=BG()==="off"&&!onHome?"0":""; targetT=roam?home:loopMode?t:VIEWT[v]; boost=1; if(reduce){t=targetT; place(1); draw();}};
   const mouse={x:0,y:0}; addEventListener("pointermove",e=>{mouse.x=e.clientX/innerWidth-.5; mouse.y=e.clientY/innerHeight-.5;},{passive:true});
   function resize(){const w=innerWidth,h=innerHeight; renderer.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix(); if(reduce) draw();}
   const camPos=new THREE.Vector3(), look=new THREE.Vector3(), up=new THREE.Vector3(0,1,0);
@@ -538,29 +542,34 @@ scene=(function(){
   function place(dt){
     const maxS=Math.max(1,document.documentElement.scrollHeight-innerHeight), sp=Math.min(1,Math.max(0,window.scrollY/maxS));
     const loop=loopMode; let u=0, wrapped=false;
-    if(loop){u=(clock%LOOP)/LOOP; loopU=u; wrapped=u<lastU; lastU=u; spS=u;} else spS+=(sp-spS)*(reduce?1:Math.min(1,dt*4));
+    if(loop){u=(clock%LOOP)/LOOP; loopU=u; wrapped=false; lastU=u; spS=u;} else spS+=(sp-spS)*(reduce?1:Math.min(1,dt*4));
     const dy=window.scrollY-lastSY; lastSY=window.scrollY; vel+=((dt>0?dy/dt:0)-vel)*Math.min(1,dt*6); const v=loop?Math.sin(u*Math.PI*6)*.25:Math.max(-1,Math.min(1,vel/2500));
     // scroll flies the drone along its path: the home page spans the whole route, other pages a stretch around their waypoint
-    if(loop){const e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2; targetT=.03+.94*e; t=targetT;}
+    const ez=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2, back=loop&&u>=.54;
+    if(loop){targetT=u<.46?.03+.94*ez(u/.46):u<.54?.97-Math.sin((u-.46)/.08*Math.PI)*.012:.97-.94*ez((u-.54)/.46); t=targetT;}
     else if(roam) targetT=Math.max(.04,home-.06)+spS*Math.min(.9,.95-home+.06)+(reduce?0:Math.sin(clock*.6)*.015);
     else targetT=VIEWT[currentViewKey]+(spS-.5)*.14;
     boost=Math.max(0,boost-dt*.7); const ease=1.6+boost*2.6; if(!loop) t+=(targetT-t)*(reduce?1:Math.min(1,dt*ease)); t=Math.min(.985,Math.max(.015,t));
     const p=curve.getPointAt(t), tan=curve.getTangentAt(t);
     drone.position.copy(p); drone.position.y+=Math.sin(clock*3)*.15;
-    drone.lookAt(p.clone().add(new THREE.Vector3(tan.x,0,tan.z))); drone.rotateZ(-tan.y*.6); drone.rotateX(v*.45);
+    const fw=back?-1:1; drone.lookAt(p.clone().add(new THREE.Vector3(tan.x*fw,0,tan.z*fw))); drone.rotateZ(-tan.y*.6*fw); drone.rotateX(v*.45);
     const side=new THREE.Vector3().crossVectors(tan,up).normalize();
     // camera orbits the drone as you scroll
-    const a=loop?u*Math.PI*2-.35:spS*Math.PI*1.1-.35, near=!loop&&roam&&window.scrollY<innerHeight*.8?1:0, dist=(loop?10+3*Math.sin(u*Math.PI*4):near?8:15)*(innerWidth<innerHeight?1.7:innerWidth<900?1.3:1);
+    // ten 30-second shots, blended at the joins: orbit, chase, side track, crane, hover reveal, low front, return chase, fast orbit, wide high, close side
+    const SH=[[l=>-.35+l*Math.PI,10,4],[l=>Math.PI/2,9,3],[l=>0,22,7],[l=>l*Math.PI*.8,14,16],[l=>Math.PI*.2+l*Math.PI*1.2,18,9],[l=>-Math.PI/2,9,-.5],[l=>-Math.PI/2,9,3],[l=>l*Math.PI*2,12,5],[l=>Math.PI/4,26,12],[l=>Math.PI*(1-.35/Math.PI)+l*.0,9,2.5]];
+    const shot=(k,l)=>{const s=SH[(k+10)%10]; return [s[0](l),s[1],s[2]];};
+    let la=0,ld=10,lh=4; if(loop){const k=Math.floor(u*10), l=u*10-k, cur=shot(k,l), nx=shot(k+1,0), b=l>.82?(l-.82)/.18:0, sb=b*b*(3-2*b); la=cur[0]+(nx[0]-cur[0])*sb; ld=cur[1]+(nx[1]-cur[1])*sb; lh=cur[2]+(nx[2]-cur[2])*sb;}
+    const a=loop?la:spS*Math.PI*1.1-.35, near=!loop&&roam&&window.scrollY<innerHeight*.8?1:0, dist=(loop?ld*(onHome?1:1.15):near?8:15)*(innerWidth<innerHeight?1.7:innerWidth<900?1.3:1);
     const dir=side.clone().multiplyScalar(Math.cos(a)).addScaledVector(tan,-Math.sin(a)).normalize();
-    camPos.copy(p).addScaledVector(dir,dist); camPos.y+=(near?2.5:5)+Math.sin(spS*Math.PI)*6-mouse.y*4; camPos.addScaledVector(tan,mouse.x*5);
-    drone.scale.setScalar(drone.scale.x+((loop?1.6:1.2)-drone.scale.x)*Math.min(1,dt*2));
-    if(loop) cam.setViewOffset(innerWidth,innerHeight,0,-innerHeight*.33,innerWidth,innerHeight); else if(cam.view&&cam.view.enabled) cam.clearViewOffset();
-    if(loop) canvas.style.opacity=String(Math.max(0,Math.min(1,u>.965?(1-u)/.035:u<.025?u/.025:1)));
+    camPos.copy(p).addScaledVector(dir,dist); camPos.y+=(loop?lh:(near?2.5:5)+Math.sin(spS*Math.PI)*6)-mouse.y*4; camPos.addScaledVector(tan,mouse.x*5);
+    drone.scale.setScalar(drone.scale.x+((loop&&onHome?1.6:1.3)-drone.scale.x)*Math.min(1,dt*2));
+    if(loop&&onHome) cam.setViewOffset(innerWidth,innerHeight,0,-innerHeight*.33,innerWidth,innerHeight); else if(cam.view&&cam.view.enabled) cam.clearViewOffset();
+    
     if(reduce||wrapped){cam.position.copy(camPos); look.copy(p);} else {cam.position.lerp(camPos,Math.min(1,dt*1.8)); look.lerp(p,Math.min(1,dt*2.2));}
     cam.lookAt(look);
     // depth layers move at different speeds
     pts.position.y=-spS*30; pts.position.x=-spS*20; grid.position.z=(spS*60)%4; grid.position.y=-6-spS*3;
-    rings.forEach((r,i)=>{r.g.rotation.z=spS*Math.PI*(i%2?1:-1)*.6; r.g.scale.setScalar(i===curIdx&&!reduce?1+Math.sin(clock*4)*.05:1); r.m.opacity=i===curIdx?1:.65;});
+    rings.forEach((r,i)=>{const rt=(i+1)/(P.length+1), pass=loop?Math.max(0,1-Math.abs(t-rt)*14):0; r.g.rotation.z=(loop?clock*.15:spS*Math.PI)*(i%2?1:-1)*.6; r.g.scale.setScalar((i===curIdx&&!reduce?1+Math.sin(clock*4)*.05:1)+pass*.35); r.m.opacity=Math.min(1,(i===curIdx?1:.65)+pass);});
   }
   const draw=()=>renderer.render(S,cam);
   if(reduce) addEventListener("scroll",()=>{place(1);draw();},{passive:true});
@@ -593,6 +602,8 @@ document.querySelectorAll("[data-t]").forEach(el=>{const v=TEXT[el.dataset.t]; i
 let daily={};
 try{const v=JSON.parse(localStorage.getItem(DKEY)||"null"); if(v&&typeof v==="object") daily=v;}catch(e){}
 let dailyTimer=null;
+const PINKEY=PROFILE.key+"-pins"; let pins={}; try{const v=JSON.parse(localStorage.getItem(PINKEY)||"null"); if(v&&typeof v==="object") pins=v;}catch(e){}
+
 function saveDaily(){
   try{localStorage.setItem(DKEY,JSON.stringify(daily));}catch(e){}
   if(mode==="db"&&store&&canWrite){clearTimeout(dailyTimer); dailyTimer=setTimeout(()=>{store.doc("daily/state").set({days:daily,updated:new Date().toISOString()}).catch(()=>setSync(false,"Save failed"));},600);}
@@ -808,12 +819,13 @@ document.getElementById("cs-reset")?.addEventListener("click",()=>{if(!confirmSo
 (function(){let m=null; try{m=sessionStorage.getItem(PROFILE.key+"-msg"); sessionStorage.removeItem(PROFILE.key+"-msg");}catch(e){} if(m) setTimeout(()=>dstat(m),50);})();
 
 /* ---------- sync bundle (backup file and Gist share one format) ---------- */
-function bundle(){return {v:1,app:PROFILE.key,saved:new Date().toISOString(),progress:prog,parts,daily,custom:CUSTOM};}
+function bundle(){return {v:1,app:PROFILE.key,saved:new Date().toISOString(),progress:prog,parts,daily,pins,custom:CUSTOM};}
 function mergeBundle(o,force){
   let changed=false, customChanged=false;
   if(o.progress&&typeof o.progress==="object") Object.entries(o.progress).forEach(([id,x])=>{if(!x) return; const l=prog[id]; if(force||!l||(x.u||0)>(l.u||0)){if(JSON.stringify(l)!==JSON.stringify(x)){prog[id]=x; changed=true;}}});
   if(o.parts&&Array.isArray(o.parts.inv)&&Array.isArray(o.parts.buy)&&(force||(o.parts.u||0)>(parts.u||0))&&JSON.stringify(o.parts)!==JSON.stringify(parts)){parts=o.parts; try{localStorage.setItem(PKEY,JSON.stringify(parts));}catch(e){} changed=true;}
   if(o.daily&&typeof o.daily==="object") Object.entries(o.daily).forEach(([k,x])=>{if(!x||typeof x!=="object") return; const l=daily[k]; if(force||!l||(x.u||0)>(l.u||0)){if(JSON.stringify(l)!==JSON.stringify(x)){daily[k]=x; changed=true;}}});
+  if(o.pins&&typeof o.pins==="object") Object.entries(o.pins).forEach(([k,x])=>{if(!x||typeof x!=="object") return; const l=pins[k]; if(force||!l||(x.u||0)>(l.u||0)){if(JSON.stringify(l)!==JSON.stringify(x)){pins[k]=x; changed=true; try{localStorage.setItem(PINKEY,JSON.stringify(pins));}catch(e){} window.__renderInbox&&__renderInbox();}}});
   if(o.custom&&typeof o.custom==="object"&&(force||(o.custom.u||0)>(CUSTOM.u||0))&&JSON.stringify(o.custom)!==JSON.stringify(CUSTOM)){try{localStorage.setItem(CKEY,JSON.stringify(o.custom));}catch(e){} customChanged=true;}
   if(changed){saveLocal(); try{localStorage.setItem(DKEY,JSON.stringify(daily));}catch(e){} renderAll(); renderParts();}
   return {changed,customChanged};
@@ -835,7 +847,7 @@ async function pullGist(){const g=gcfg(); if(!g.token||!g.id||gBusy) return; gBu
     syncing=false;
     if(o&&o.v===1){const r=mergeBundle(o,false); if(r.customChanged){gBusy=false; location.reload(); return;}}
     gLast=new Date(); gstat(); if(mode!=="db") setSync(true,"Gist synced");
-    gBusy=false; if(!o||gDirty||JSON.stringify(o.progress)!==JSON.stringify(prog)||JSON.stringify(o.daily)!==JSON.stringify(daily)||JSON.stringify(o.parts)!==JSON.stringify(parts)) await pushGist();
+    gBusy=false; if(!o||gDirty||JSON.stringify(o.progress)!==JSON.stringify(prog)||JSON.stringify(o.daily)!==JSON.stringify(daily)||JSON.stringify(o.parts)!==JSON.stringify(parts)||JSON.stringify(o.pins||{})!==JSON.stringify(pins)) await pushGist();
   }catch(e){gstat("Pull failed: "+e.message,1); if(mode!=="db") setSync(false,"Sync failed");} finally{gBusy=false; syncing=false;}}
 document.getElementById("cs-gsave")?.addEventListener("click",async()=>{const token=val("cs-tok"), id=val("cs-gid"); if(!token){gstat("Paste a token first.",1); return;}
   try{localStorage.setItem(GKEY,JSON.stringify({token,id}));}catch(e){}
@@ -854,8 +866,9 @@ function dbHook(db){
 function dailyStreak(){let n=0; for(let dt=new Date(today);;dt=addDays(dt,-1)){if(hoursOf(iso(dt))>0) n++; else if(+dt!==+today) break; if(n>3660) break;} return n;}
 function weekPct(){const w=weekStartOf(today); let th=0,tt=0; for(let j=0;j<7;j++){const dt=addDays(w,j); th+=hoursOf(iso(dt)); tt+=targetOf(dt);} return tt?Math.round(th/tt*100):0;}
 renderConsole();
+(function(){const sel=document.getElementById("cs-bg"); if(!sel) return; let m="loop"; try{m=localStorage.getItem(PROFILE.key+"-bg")||PROFILE.bg||"loop";}catch(e){} sel.value=m; sel.onchange=()=>{try{localStorage.setItem(PROFILE.key+"-bg",sel.value);}catch(e){} scene.setView&&scene.setView(currentView); dstat("Background updated.");};})();
 if(window.claude&&claude.use){["cs-sync","cs-data"].forEach(id=>{const el=document.getElementById(id); if(el) el.innerHTML=id==="cs-sync"?'<h2>Sync</h2><p class="cs-note">This copy runs on claude.ai and already syncs through your account. Gist sync and backups are available in the GitHub version.</p>':'';}); const d=document.getElementById("cs-data"); if(d) d.hidden=true;}
-window.__J={ITEMS,PHASES,RES,BOOKS,HARD,COUNTDOWNS,DAILY,PROFILE,TEXT,get daily(){return daily;},get prog(){return prog;},bundle,mergeBundle};
+window.__J={get scene(){return scene;},ITEMS,PHASES,RES,BOOKS,HARD,COUNTDOWNS,DAILY,PROFILE,TEXT,get daily(){return daily;},get prog(){return prog;},bundle,mergeBundle};
 
 /* =====================================================================
    START YOUR JOURNEY: questions → a journal rebuilt around the answers
@@ -864,9 +877,9 @@ window.__J={ITEMS,PHASES,RES,BOOKS,HARD,COUNTDOWNS,DAILY,PROFILE,TEXT,get daily(
 const HAS_WIZ=typeof WIZARD!=="undefined";
 const MON12=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const wzDefaults=()=>{const s=iso(today), e=iso(addDays(today,730)); return {name:"",title1:"",city:"",currency:PROFILE.currency||"$",study:"",start:s,end:e,exams:[],breaks:[],low:[],
-  level:"0",knows:[],focus:"aerial",goal:"abroad",routes:["japan"],intakeM:"10",intakeY:String(+e.slice(0,4)),englishDone:"no",hours:"15",weekend:[0,6],from:"06:00",to:"24:00",when:"evening",owned:[]};};
+  level:"0",knows:[],focus:"aerial",goal:"abroad",routes:["japan"],intakeM:"10",intakeY:String(+e.slice(0,4)),englishDone:"no",hours:"15",weekend:[0,6],from:"06:00",to:"24:00",when:"evening",owned:[],platforms:["ocw","fcc","yt","docs"],style:"build",paid:"some"};};
 let WZ=Object.assign(wzDefaults(),(CUSTOM&&CUSTOM.wizard)||{}), wzStep=0;
-const WZSTEPS=["You","Timeline","Your level","Focus & goal","Time","Tools & tests","Review"];
+const WZSTEPS=["You","Timeline","Your level","Focus & goal","Time","Learning","Tools & tests","Review"];
 const chip=(name,val,label,on,type="checkbox")=>`<label class="wz-chip"><input type="${type}" name="${name}" value="${esc(val)}" ${on?"checked":""}><span>${esc(label)}</span></label>`;
 const months=(name,label,help)=>`<fieldset class="wz-f"><legend>${label}</legend>${help?`<p class="wz-help">${help}</p>`:""}<div class="wz-chips">${MON12.map((m,i)=>chip(name,i+1,m,(WZ[name]||[]).map(Number).includes(i+1))).join("")}</div></fieldset>`;
 const tf=(id,label,val,type="text",extra="",help="")=>`<label class="wz-f">${label}${help?`<small>${help}</small>`:""}<input id="wz-${id}" name="${id}" type="${type}" value="${esc(val??"")}" ${extra}></label>`;
@@ -889,14 +902,17 @@ function wzRender(){
     `<fieldset class="wz-f"><legend>Your weekend days</legend><div class="wz-chips">${DN.map((n,i)=>chip("weekend",i,n,(WZ.weekend||[]).map(Number).includes(i))).join("")}</div></fieldset>`+
     `<fieldset class="wz-f"><legend>On weekdays you study best in the</legend><div class="wz-chips">${[["morning","Morning"],["evening","Evening"],["night","Late night"]].map(([v,l])=>chip("when",v,l,WZ.when===v,"radio")).join("")}</div></fieldset>`+
     `<div class="wz-row">${tf("from","Your day starts",WZ.from,"time")}${tf("to","Your day ends",WZ.to==="24:00"?"23:59":WZ.to,"time")}</div>`;
-  if(wzStep===5) h=`<fieldset class="wz-f"><legend>What do you already own?</legend><div class="wz-chips">${WIZARD.owned.map(([k,l])=>chip("owned",k,l,(WZ.owned||[]).includes(k))).join("")}</div></fieldset>`+
+  if(wzStep===5) h=`<fieldset class="wz-f"><legend>Which free platforms do you like learning from?</legend><p class="wz-help">Courses from these get a “For you” tag and move to the top of Learn.</p><div class="wz-chips">${WIZARD.learn.map(([k,l])=>chip("platforms",k,l,(WZ.platforms||[]).includes(k))).join("")}</div></fieldset>`+
+    `<fieldset class="wz-f"><legend>How do you learn best?</legend><div class="wz-chips">${[["video","Watching lectures and videos"],["read","Reading docs and books"],["build","Building first, theory when stuck"]].map(([v,l])=>chip("style",v,l,WZ.style===v,"radio")).join("")}</div></fieldset>`+
+    `<fieldset class="wz-f"><legend>Paid courses and books</legend><div class="wz-chips">${[["free","Free only"],["some","Some paid is fine"]].map(([v,l])=>chip("paid",v,l,WZ.paid===v,"radio")).join("")}</div></fieldset>`;
+  if(wzStep===6) h=`<fieldset class="wz-f"><legend>What do you already own?</legend><div class="wz-chips">${WIZARD.owned.map(([k,l])=>chip("owned",k,l,(WZ.owned||[]).includes(k))).join("")}</div></fieldset>`+
     (WZ.goal==="abroad"?`<fieldset class="wz-f"><legend>English test (IELTS / TOEFL)</legend><div class="wz-chips">${[["no","I still need to take it"],["yes","I already have a valid score"],["na","Not needed for me"]].map(([v,l])=>chip("englishDone",v,l,WZ.englishDone===v,"radio")).join("")}</div></fieldset>`:"");
-  if(wzStep===6){ const p=wzPlan(); h=`<div class="wz-review"><p>Here is what will be built. Nothing changes until you press <b>Build my journal</b>.</p>
+  if(wzStep===7){ const p=wzPlan(); h=`<div class="wz-review"><p>Here is what will be built. Nothing changes until you press <b>Build my journal</b>.</p>
     <dl><dt>Journal</dt><dd>${esc(p.titleWords.join(" "))} · ${esc(WZ.city||"—")}</dd><dt>Journey</dt><dd>${esc(p.span)} · about ${p.hoursTotal} usable hours</dd>
     <dt>Phases</dt><dd><ul>${p.phases.map(x=>`<li><b>${esc(x.code)}</b> ${esc(x.name)} · ${esc(x.dates)}${x.skip?" · <i>already known, kept as a short review</i>":""}</li>`).join("")}</ul></dd>
     <dt>Deadlines</dt><dd>${p.hard.length?`<ul>${p.hard.map(x=>`<li>${esc(x[1])} · <b>${esc(x[2])}</b>${x[4]?` · <a href="${x[4]}" target="_blank" rel="noopener">source ↗</a>`:""}</li>`).join("")}</ul>`:"No external deadlines for this goal."}</dd>
     <dt>Daily plan</dt><dd>${DN.map((n,i)=>`${n} ${p.daily.targets[i]} h`).join(" · ")}</dd>
-    <dt>Parts</dt><dd>${p.inv.length} owned · ${p.buy.length} to buy over time</dd></dl>
+    <dt>Learning</dt><dd>${p.mine} resources from your platforms marked “For you”${WZ.paid==="free"?" · free only":""} · ${({video:"video links first",read:"docs and books first",build:"project links first"})[WZ.style]||""}</dd><dt>Parts</dt><dd>${p.inv.length} owned · ${p.buy.length} to buy over time</dd></dl>
     ${p.warn.length?`<div class="wz-warn">${p.warn.map(w=>`<p>⚠ ${esc(w)}</p>`).join("")}</div>`:""}
     <p class="wz-help">Dates for scholarships come from each country's official page (linked) and move a little every year. Want them double-checked? Copy a ready-made prompt and paste it into Claude or any AI with web search.</p>
     <button type="button" class="btn-ghost" id="wz-prompt">Copy a research prompt</button> <span class="wz-help" id="wz-copied"></span></div>`;}
@@ -910,7 +926,7 @@ function wzRender(){
 }
 function wzRead(){
   const f=document.getElementById("wz-form"); if(!f) return;
-  const multi=new Set(["exams","breaks","low","knows","routes","weekend","owned"]), seen=new Set();
+  const multi=new Set(["exams","breaks","low","knows","routes","weekend","owned","platforms"]), seen=new Set();
   [...f.elements].forEach(el=>{if(!el.name) return; const n=el.name;
     if(multi.has(n)){ if(!seen.has(n)){WZ[n]=[]; seen.add(n);} if(el.checked) WZ[n].push(["exams","breaks","low","weekend"].includes(n)?+el.value:el.value); }
     else if(el.type==="radio"){ if(el.checked) WZ[n]=el.value; }
@@ -977,7 +993,8 @@ function wzPlan(){
   const own=new Set(WZ.owned||[]), drop=new Set(); own.forEach(k=>(WIZARD.buyMap[k]||[]).forEach(n=>drop.add(n)));
   const inv=WIZARD.owned.filter(o=>own.has(o[0])).map(o=>[o[1],1,o[2],"From setup"]);
   const name=WZ.name||"You", t1=(WZ.title1||name.toUpperCase()+"’S").toUpperCase();
-  return {S,JE,span:SPANf(WZ.start,iso(JE)),phases,hard,tests,targets,daily:{targets,plan},inv,buy:BUY0.filter(b=>!drop.has(b[0])),warn,hoursTotal,foc,titleWords:[t1,"JOURNAL"],name,y};
+  const pre=(WIZARD.learn||[]).filter(x=>(WZ.platforms||[]).includes(x[0])).map(x=>new RegExp(x[2],"i")); const mine=RES.filter(r=>pre.some(re=>re.test(r.url))).length;
+  return {mine,S,JE,span:SPANf(WZ.start,iso(JE)),phases,hard,tests,targets,daily:{targets,plan},inv,buy:BUY0.filter(b=>!drop.has(b[0])),warn,hoursTotal,foc,titleWords:[t1,"JOURNAL"],name,y};
 }
 function wzBuildCustom(p){
   const c=JSON.parse(JSON.stringify(CUSTOM||{})); const name=p.name, city=WZ.city||"", months=Math.round((p.JE-p.S)/864e5/30.4);
@@ -1016,6 +1033,7 @@ function wzBuildCustom(p){
   ["T1","T2","T3"].forEach(id=>{ if(BY[id]&&!p.tests.find(t=>t[0]===id)) c.items[id]=null; });
   p.tests.forEach(([id,t,dt,links])=>c.items[id]={title:t,phase:"cred",due:dt,target:MON12[+dt.slice(5,7)-1]+" "+dt.slice(0,4),star:true,desc:"Book the test date early; scores take a few weeks to arrive.",links});
   // home stage, plan text, apply page
+  c.learn={platforms:WZ.platforms||[],style:WZ.style,paid:WZ.paid};
   c.lx=[["Electronics","p1"],["Embedded","p1b"],["ROS 2","p3"],[p.foc.lx,"p4"]];
   const mlist=a=>(a||[]).map(m=>MON12[m-1]).join(", ")||"none";
   c.plan={how:{sub:`${p.span} · about ${p.hoursTotal.toLocaleString("en-US")} usable hours`,body:`<p>${months} months at about ${+WZ.hours} hours a week, with study cut back in exam months and a 20% buffer for bad weeks. Each phase ends in a <b>gate</b>: a project you either finish or don't.${fh?` Your first hard date is <b>${esc(fh[1])}</b> on ${esc(fh[2])}, so phases 1–4 are packed before it.`:""}</p><div class="mini-wrap"><table class="mini"><tr><th>Mode</th><th>Months</th><th>Hours/wk</th><th>Rule</th></tr><tr><td>Normal</td><td>The rest</td><td>${+WZ.hours}</td><td>Follow the phase plan</td></tr><tr><td>Exam</td><td>${mlist(WZ.exams)}</td><td>${Math.max(2,Math.round(+WZ.hours/5))}</td><td>Review cards and one small rebuild</td></tr><tr><td>Sprint</td><td>${mlist(WZ.breaks)}</td><td>${Math.round(+WZ.hours*1.6)}</td><td>Big builds; keep days off</td></tr><tr><td>Low</td><td>${mlist(WZ.low)}</td><td>${Math.round(+WZ.hours*.6)}</td><td>Lighter projects, reading, theory</td></tr></table></div><p><b>Falling behind?</b> Cut stretch projects and optional credentials first. Never cut the review habit or ★ items.</p>`}};
@@ -1053,6 +1071,121 @@ async function wzBuild(){
   document.getElementById("wz-back").addEventListener("click",()=>{wzRead(); wzStep=Math.max(0,wzStep-1); wzRender();});
   document.getElementById("wz-steps").addEventListener("click",e=>{const li=e.target.closest("li"); if(!li) return; const i=[...li.parentNode.children].indexOf(li); if(i<wzStep){wzRead(); wzStep=i; wzRender();}});
   wzRender();
+})();
+
+/* =====================================================================
+   INBOX: optional, per-device connections (GitHub, Gmail, Reddit),
+   pinned links (synced) and quick links. Tokens never leave this browser
+   except to talk to the service they belong to.
+   ===================================================================== */
+const IBKEY=PROFILE.key+"-inbox", IBCACHE=PROFILE.key+"-inboxcache";
+const IN_CLAUDE=!!(window.claude&&claude.use);
+let IB={}; try{IB=JSON.parse(localStorage.getItem(IBKEY)||"{}")||{};}catch(e){}
+let ibItems=[]; try{ibItems=JSON.parse(localStorage.getItem(IBCACHE)||"[]")||[];}catch(e){}
+let ibFilter="all", ibStatus={}, ibQEdit=false;
+const ibSave=()=>{try{localStorage.setItem(IBKEY,JSON.stringify(IB));}catch(e){}};
+const ibCacheSave=()=>{try{localStorage.setItem(IBCACHE,JSON.stringify(ibItems.slice(0,120)));}catch(e){}};
+const savePins=()=>{try{localStorage.setItem(PINKEY,JSON.stringify(pins));}catch(e){} markDirty();};
+const ago=ts=>{const s=(Date.now()-ts)/1000; return s<3600?Math.max(1,Math.round(s/60))+"m":s<86400?Math.round(s/3600)+"h":Math.round(s/86400)+"d";};
+const QL=[["linkedin","LinkedIn","https://www.linkedin.com/notifications/"],["x","X","https://x.com/notifications"],["discord","Discord","https://discord.com/channels/@me"],["youtube","YouTube","https://www.youtube.com/feed/subscriptions"],["instagram","Instagram","https://www.instagram.com/"],["facebook","Facebook","https://www.facebook.com/notifications"],["gmail","Gmail","https://mail.google.com/mail/u/0/#starred"],["github","GitHub","https://github.com/notifications"],["reddit","Reddit","https://www.reddit.com/message/inbox/"]];
+const SRC={
+  gh:{n:"GitHub",icon:"GH",help:`Create a <b>classic</b> token with only the <code>notifications</code> scope (GitHub's notifications API doesn't accept fine-grained tokens): <a href="https://github.com/settings/tokens/new?scopes=notifications&description=Journal%20inbox" target="_blank" rel="noopener">make one ↗</a>, then paste it here.`,fields:[["token","Classic token (notifications scope)","password"]]},
+  gm:{n:"Gmail",icon:"M",help:`Shows <b>starred</b> and <b>important unread</b> mail (subject and sender only, never the body). Gmail needs your own free Google Cloud OAuth client: create a <i>Web application</i> client ID, add this site's address as an authorised JavaScript origin, enable the Gmail API and add yourself as a test user. Steps in INSTRUCTIONS.md. Access lasts about an hour, then press Refresh.`,fields:[["client","Google OAuth client ID","text"]]},
+  rd:{n:"Reddit",icon:"R",help:`Shows unread messages and your saved posts. Register an <i>installed app</i> at <a href="https://www.reddit.com/prefs/apps" target="_blank" rel="noopener">reddit.com/prefs/apps ↗</a> with this exact redirect URI: <code>${esc(location.origin+location.pathname)}</code>, then paste its client ID. Access lasts an hour.`,fields:[["client","Reddit app client ID","text"]]}
+};
+function ibUnread(){return ibItems.filter(i=>i.unread&&(IB[i.src]||{}).on!==false&&!(i.src!=="pin"&&!(IB[i.src]||{}).token)).length+Object.values(pins).filter(p=>!p.del&&!p.done).length;}
+function ibBadge(){const n=ibUnread(); [document.getElementById("tab-inbox"),...document.querySelectorAll('#overlay-nav [data-view="inbox"],#foot-nav [data-go="inbox"]')].forEach(t=>{if(!t) return; t.textContent="Inbox"+(n?` · ${n}`:"");});}
+function renderInbox(){
+  const host=document.getElementById("ib-src"); if(!host) return;
+  host.innerHTML=Object.entries(SRC).map(([k,s])=>{const c=IB[k]||{}, conn=!!c.token&&(!c.exp||c.exp>Date.now()), st=ibStatus[k]||"";
+    const disabled=IN_CLAUDE?"disabled":"";
+    return `<div class="glass ib-card${conn?" on":""}"><div class="ib-ch"><i class="ib-ic ib-${k}">${s.icon}</i><b>${s.n}</b><span class="ib-st">${IN_CLAUDE?"GitHub version only":conn?"Connected":c.token&&c.exp?"Expired: press Connect":c.client||c.token?"Ready":"Off"}</span></div>
+      ${conn?`<label class="ib-tog"><input type="checkbox" data-ibshow="${k}" ${c.on!==false?"checked":""}> Show in the list</label><div class="cs-act" style="justify-content:flex-start"><button type="button" class="dl-btn" data-ibre="${k}" ${disabled}>Refresh</button><button type="button" class="dl-btn" data-ibrm="${k}">Disconnect</button></div>`:
+      `<details ${c.client&&!conn?"open":""}><summary>Connect ${s.n}</summary><p class="cs-note">${s.help}</p>${s.fields.map(([f,l,t])=>`<label>${l}<input data-ibf="${k}.${f}" type="${t}" autocomplete="off" value="${esc(c[f]&&f!=="token"?c[f]:"")}"></label>`).join("")}<div class="cs-act"><button type="button" class="btn-pill" data-ibgo="${k}" ${disabled}>Connect</button></div></details>`}
+      ${st?`<p class="cs-status${/fail|error|denied|401|403/i.test(st)?" bad":""}">${esc(st)}</p>`:""}</div>`;}).join("");
+  const pinItems=Object.entries(pins).filter(([,p])=>!p.del).map(([id,p])=>({src:"pin",id,title:p.t,sub:[p.s,p.note].filter(Boolean).join(" · "),when:p.c||p.u,url:p.url,unread:!p.done,due:p.due,done:p.done}));
+  const all=[...pinItems,...ibItems.filter(i=>(IB[i.src]||{}).on!==false&&(IB[i.src]||{}).token)].sort((a,b)=>(b.unread-a.unread)||((a.due||"9999")<(b.due||"9999")?-1:(a.due||"9999")>(b.due||"9999")?1:0)||(b.when-a.when));
+  const counts={all:all.length,pin:pinItems.length,gh:0,gm:0,rd:0}; all.forEach(i=>{if(counts[i.src]!=null&&i.src!=="pin") counts[i.src]++;});
+  document.getElementById("ib-filter").innerHTML=[["all","All"],["pin","Pinned"],["gm","Gmail"],["gh","GitHub"],["rd","Reddit"]].map(([k,l])=>`<button type="button" data-f="${k}" aria-pressed="${ibFilter===k}">${l}${counts[k]?" "+counts[k]:""}</button>`).join("");
+  const list=all.filter(i=>ibFilter==="all"||i.src===ibFilter);
+  const lab={pin:"PIN",gh:"GITHUB",gm:"GMAIL",rd:"REDDIT"};
+  document.getElementById("ib-list").innerHTML=list.length?list.map(i=>`<li class="ib-it${i.unread?" new":""}${i.done?" done":""}"><span class="ib-tag ib-${i.src}">${lab[i.src]}</span><div class="ib-tx">${i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title)}</a>`:`<b>${esc(i.title)}</b>`}<small>${esc(i.sub||"")}${i.due?` · due ${esc(i.due)}${!i.done&&d(i.due)<today?" (late)":""}`:""}</small></div><span class="ib-when">${i.when?ago(i.when):""}</span>${i.src==="pin"?`<span class="ib-pa"><button type="button" class="dl-btn" data-pdone="${i.id}" aria-label="${i.done?"Mark not done":"Mark done"}">${i.done?"↺":"✓"}</button><button type="button" class="dl-btn" data-pdel="${i.id}" aria-label="Delete pin">×</button></span>`:""}</li>`).join(""):`<li class="ib-empty">${ibFilter==="all"?"Nothing here yet. Pin a link, or connect a service on the left.":"Nothing from this source."}</li>`;
+  const conn=Object.keys(SRC).filter(k=>(IB[k]||{}).token).map(k=>SRC[k].n);
+  document.getElementById("ib-sub").textContent=(conn.length?"Connected: "+conn.join(", "):"No services connected")+` · ${Object.values(pins).filter(p=>!p.del).length} pinned`;
+  const on=new Set(IB.quick||["linkedin","x","discord","youtube"]), custom=IB.qcustom||[];
+  document.getElementById("ib-qgrid").innerHTML=[...QL.filter(q=>on.has(q[0])),...custom.map((c,i)=>["c"+i,c[0],c[1]])].map(([k,n,u])=>`<a class="ib-q" href="${esc(u)}" target="_blank" rel="noopener">${esc(n)} ↗</a>`).join("")||`<span class="cs-note">No quick links chosen.</span>`;
+  const qf=document.getElementById("ib-qform"); qf.hidden=!ibQEdit;
+  if(ibQEdit) qf.innerHTML=`<div class="wz-chips">${QL.map(([k,n])=>`<label class="wz-chip"><input type="checkbox" data-ql="${k}" ${on.has(k)?"checked":""}><span>${n}</span></label>`).join("")}</div>
+    ${custom.map((c,i)=>`<div class="cs-item"><span class="t">${esc(c[0])}</span><span></span><span></span><button type="button" class="dl-btn" data-qdel="${i}">×</button></div>`).join("")}
+    <div class="cs-line" style="grid-template-columns:1fr 1.4fr auto;border:0"><label>Name<input id="ib-qn" maxlength="30"></label><label>Link<input id="ib-qu" type="url" placeholder="https://"></label><button type="button" class="dl-btn" id="ib-qadd">Add</button></div>`;
+  ibBadge();
+}
+window.__renderInbox=renderInbox;
+/* ---------- fetchers ---------- */
+async function ibJSON(url,token,extra={}){const r=await fetch(url,{headers:Object.assign({"Authorization":"Bearer "+token},extra),cache:"no-store"}); if(!r.ok){const e=new Error(r.status===401?"Access expired or rejected (401)":r.status===403?"Not allowed (403)":"Error "+r.status); e.status=r.status; throw e;} return r.json();}
+const ghHtml=n=>{const u=(n.subject&&n.subject.url)||""; if(/\/repos\/[^/]+\/[^/]+\/(issues|pulls)\/\d+/.test(u)) return u.replace("https://api.github.com/repos/","https://github.com/").replace("/pulls/","/pull/"); return (n.repository&&n.repository.html_url)||"https://github.com/notifications";};
+const FETCH={
+  gh:async c=>{const a=await ibJSON("https://api.github.com/notifications?per_page=30",c.token,{"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"});
+    return a.map(n=>({src:"gh",id:"gh"+n.id,title:n.subject.title,sub:`${n.repository.full_name} · ${String(n.reason||"").replace(/_/g," ")}`,when:Date.parse(n.updated_at),url:ghHtml(n),unread:!!n.unread}));},
+  gm:async c=>{const B="https://gmail.googleapis.com/gmail/v1/users/me/messages";
+    const lists=await Promise.all([ibJSON(B+"?labelIds=STARRED&maxResults=12",c.token),ibJSON(B+"?labelIds=IMPORTANT&labelIds=UNREAD&maxResults=12",c.token)]);
+    const ids=[...new Set([...(lists[0].messages||[]),...(lists[1].messages||[])].map(m=>m.id))].slice(0,20);
+    const msgs=await Promise.all(ids.map(id=>ibJSON(`${B}/${id}?format=metadata&metadataHeaders=Subject&metadataHeaders=From`,c.token)));
+    return msgs.map(m=>{const h=n=>((m.payload&&m.payload.headers)||[]).find(x=>x.name===n)?.value||""; const L=m.labelIds||[];
+      return {src:"gm",id:"gm"+m.id,title:h("Subject")||"(no subject)",sub:h("From").replace(/<.*>/,"").trim()+(L.includes("STARRED")?" · starred":"")+(L.includes("IMPORTANT")?" · important":""),when:+m.internalDate,url:"https://mail.google.com/mail/u/0/#all/"+m.threadId,unread:L.includes("UNREAD")||L.includes("STARRED")};});},
+  rd:async c=>{const B="https://oauth.reddit.com"; const me=await ibJSON(B+"/api/v1/me?raw_json=1",c.token);
+    const [un,sv]=await Promise.all([ibJSON(B+"/message/unread?limit=15&raw_json=1",c.token),ibJSON(`${B}/user/${encodeURIComponent(me.name)}/saved?limit=10&raw_json=1`,c.token)]);
+    const out=[]; (un.data?.children||[]).forEach(x=>{const m=x.data; out.push({src:"rd",id:"rd"+m.name,title:m.subject||m.link_title||"Message",sub:`u/${m.author||"reddit"} · ${String(m.body||"").slice(0,90)}`,when:m.created_utc*1000,url:m.context?"https://www.reddit.com"+m.context:"https://www.reddit.com/message/inbox/",unread:true});});
+    (sv.data?.children||[]).forEach(x=>{const m=x.data; out.push({src:"rd",id:"rd"+m.name,title:m.title||m.link_title||"Saved comment",sub:`r/${m.subreddit} · saved`,when:m.created_utc*1000,url:"https://www.reddit.com"+m.permalink,unread:false});});
+    return out;}
+};
+async function ibRefresh(only){
+  if(IN_CLAUDE) return;
+  const ks=(only?[only]:Object.keys(SRC)).filter(k=>{const c=IB[k]||{}; return c.token&&(!c.exp||c.exp>Date.now());});
+  for(const k of ks){ ibStatus[k]="Loading…"; renderInbox();
+    try{const items=await FETCH[k](IB[k]); ibItems=ibItems.filter(i=>i.src!==k).concat(items); ibStatus[k]=`${items.length} item${items.length===1?"":"s"} · updated ${new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;}
+    catch(e){ibStatus[k]="Failed: "+e.message+(e.message.includes("Failed to fetch")?" (network or blocked)":""); if(e.status===401&&k!=="gh"){IB[k].exp=1; ibSave();}}
+  }
+  ibCacheSave(); renderInbox(); renderDeck();
+}
+/* Gmail sign-in uses Google Identity Services (token model, no server) */
+function gmConnect(){
+  const c=IB.gm||{}; if(!c.client){ibStatus.gm="Paste your client ID first."; renderInbox(); return;}
+  const go=()=>{try{const tc=google.accounts.oauth2.initTokenClient({client_id:c.client,scope:"https://www.googleapis.com/auth/gmail.metadata",callback:r=>{if(r.error){ibStatus.gm="Sign-in failed: "+r.error; renderInbox(); return;} IB.gm=Object.assign(IB.gm||{},{token:r.access_token,exp:Date.now()+(+r.expires_in||3600)*1000,on:true}); ibSave(); ibRefresh("gm");}}); tc.requestAccessToken({prompt:c.token?"":"consent"});}catch(e){ibStatus.gm="Sign-in failed: "+e.message; renderInbox();}};
+  if(window.google&&google.accounts&&google.accounts.oauth2) return go();
+  const s=document.createElement("script"); s.src="https://accounts.google.com/gsi/client"; s.async=true; s.onload=go; s.onerror=()=>{ibStatus.gm="Couldn't load Google sign-in (blocked or offline)."; renderInbox();}; document.head.appendChild(s);
+}
+/* Reddit uses the implicit grant: redirect out, come back with #access_token */
+function rdConnect(){
+  const c=IB.rd||{}; if(!c.client){ibStatus.rd="Paste your client ID first."; renderInbox(); return;}
+  const st=Math.random().toString(36).slice(2); try{sessionStorage.setItem(PROFILE.key+"-rdstate",st); sessionStorage.setItem(PROFILE.key+"-goto","inbox");}catch(e){}
+  location.href=`https://www.reddit.com/api/v1/authorize?client_id=${encodeURIComponent(c.client)}&response_type=token&state=${st}&redirect_uri=${encodeURIComponent(location.origin+location.pathname)}&scope=${encodeURIComponent("identity privatemessages history")}`;
+}
+(function rdReturn(){ if(!/access_token=|error=/.test(location.hash)) return; const h=new URLSearchParams(location.hash.slice(1)); let st=null; try{st=sessionStorage.getItem(PROFILE.key+"-rdstate");}catch(e){}
+  if(h.get("state")&&h.get("state")===st){ if(h.get("access_token")){IB.rd=Object.assign(IB.rd||{},{token:h.get("access_token"),exp:Date.now()+(+h.get("expires_in")||3600)*1000,on:true}); ibSave(); ibStatus.rd="Connected";} else ibStatus.rd="Reddit sign-in "+(h.get("error")||"cancelled"); }
+  history.replaceState(null,"",location.pathname+location.search);})();
+/* ---------- wiring ---------- */
+(function wireInbox(){
+  const v=document.getElementById("view-inbox"); if(!v) return;
+  v.addEventListener("click",e=>{const b=e.target.closest("button,input[type=checkbox]"); if(!b) return;
+    if(b.dataset.ibgo){const k=b.dataset.ibgo; v.querySelectorAll(`[data-ibf^="${k}."]`).forEach(i=>{const f=i.dataset.ibf.split(".")[1]; IB[k]=Object.assign(IB[k]||{},{[f]:i.value.trim()});}); ibSave();
+      if(k==="gh"){ if(!IB.gh.token){ibStatus.gh="Paste a token first."; renderInbox(); return;} IB.gh.on=true; ibSave(); ibRefresh("gh"); } else if(k==="gm") gmConnect(); else rdConnect(); return;}
+    if(b.dataset.ibre){const k=b.dataset.ibre; if(k==="gm"&&(IB.gm||{}).exp<Date.now()) gmConnect(); else if(k==="rd"&&(IB.rd||{}).exp<Date.now()) rdConnect(); else ibRefresh(k); return;}
+    if(b.dataset.ibrm){const k=b.dataset.ibrm; const keep=(IB[k]||{}).client; IB[k]=keep?{client:keep}:{}; ibSave(); ibItems=ibItems.filter(i=>i.src!==k); ibCacheSave(); ibStatus[k]="Disconnected. The token was removed from this browser."; renderInbox(); return;}
+    if(b.dataset.ibshow){IB[b.dataset.ibshow].on=b.checked; ibSave(); renderInbox(); return;}
+    if(b.dataset.f){ibFilter=b.dataset.f; renderInbox(); return;}
+    if(b.dataset.pdone){const p=pins[b.dataset.pdone]; p.done=!p.done; p.u=Date.now(); savePins(); renderInbox(); return;}
+    if(b.dataset.pdel){const p=pins[b.dataset.pdel]; p.del=true; p.u=Date.now(); savePins(); renderInbox(); return;}
+    if(b.id==="ib-refresh"){ibRefresh(); return;}
+    if(b.id==="ib-qedit"){ibQEdit=!ibQEdit; b.textContent=ibQEdit?"Done":"Edit"; renderInbox(); return;}
+    if(b.dataset.ql){const on=new Set(IB.quick||["linkedin","x","discord","youtube"]); b.checked?on.add(b.dataset.ql):on.delete(b.dataset.ql); IB.quick=[...on]; ibSave(); renderInbox(); return;}
+    if(b.dataset.qdel){IB.qcustom=(IB.qcustom||[]).filter((_,i)=>i!==+b.dataset.qdel); ibSave(); renderInbox(); return;}
+    if(b.id==="ib-qadd"){const n=document.getElementById("ib-qn").value.trim(), u=document.getElementById("ib-qu").value.trim(); if(n&&/^https?:\/\//.test(u)){IB.qcustom=[...(IB.qcustom||[]),[n,u]]; ibSave(); renderInbox();} return;}
+  });
+  document.getElementById("ib-pinform").addEventListener("submit",e=>{e.preventDefault(); const t=document.getElementById("ib-pt").value.trim(); if(!t) return; let u=document.getElementById("ib-pu").value.trim(); if(u&&!/^https?:\/\//.test(u)) u="https://"+u;
+    const id="p"+Date.now().toString(36); pins[id]={t,url:u,due:document.getElementById("ib-pd").value,s:document.getElementById("ib-ps").value,c:Date.now(),u:Date.now()}; savePins(); e.target.reset(); ibFilter="all"; renderInbox(); renderDeck();});
+  renderInbox();
+  if(!IN_CLAUDE){ ibRefresh(); setInterval(()=>{if(!document.hidden) ibRefresh();},10*60000); }
 })();
 
 renderLearn(); renderCred(); renderPort(); renderCommunity(); renderAll(); paintToggle();
