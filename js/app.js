@@ -328,7 +328,7 @@ function homeMode(on){
   document.documentElement.classList.toggle("on-home",on);
   clearTimeout(HM.timer);
   if(!on){HM.on=false; HM.dealt=false; hm.classList.remove("is-dealt","is-greeting"); cancelAnimationFrame(HM.raf); return;}
-  HM.on=true; HM.visits++; HM.x=HM.tx=0; HM.dealt=false;
+  HM.on=true; HM.visits++; HM.x=HM.tx=0; HM.idx=0; HM.best=0; HM.dealt=false;
   document.getElementById("hm-hello").textContent=hmGreeting()+", "+PROFILE.first+". Welcome back to";
   const cur=curPhase(), days=daysTo(cur.start);
   document.getElementById("hm-line").textContent=TEXT.homeLine+" "+(d(cur.start)>today?`${cur.code.replace("PH ","Phase ")} · ${cur.name} starts in ${days} day${days===1?"":"s"}.`:`You're in ${cur.code.replace("PH ","Phase ")} · ${cur.name}.`)+` Your deck is being dealt…`;
@@ -338,25 +338,30 @@ function homeMode(on){
 }
 function hmTick(){
   if(!HM.on) return;
-  HM.x+=(HM.tx-HM.x)*(REDUCE?1:.11);
+  HM.x+=(HM.tx-HM.x)*(REDUCE?1:.16);
   const r=document.getElementById("deck"), st=document.getElementById("hm-stage");
   if(r&&st){ r.style.transform=`translate3d(${(-HM.x).toFixed(1)}px,0,0)`;
     const sr=st.getBoundingClientRect(), mid=sr.left+sr.width/2; let best=0,bd=1e9;
     [...r.children].forEach((c,i)=>{const cr=c.getBoundingClientRect(), cc=cr.left+cr.width/2, off=(cc-mid)/sr.width; if(Math.abs(cc-mid)<bd){bd=Math.abs(cc-mid); best=i;}
       if(HM.dealt&&!REDUCE){c.style.setProperty("--ry",(Math.max(-1,Math.min(1,off))*-26).toFixed(2)+"deg"); c.style.setProperty("--sc",(1-Math.min(1,Math.abs(off))*.14).toFixed(3)); c.style.setProperty("--sx",(50+off*120).toFixed(1)+"%");}});
-    document.getElementById("hm-count").textContent=String(best+1).padStart(2,"0")+" / "+String(DECK.length).padStart(2,"0");
+    HM.best=best; if(HM.drag) HM.idx=best; document.getElementById("hm-count").textContent=String(best+1).padStart(2,"0")+" / "+String(DECK.length).padStart(2,"0");
     document.getElementById("hm-prog").style.width=(HM.max?HM.x/HM.max*100:0).toFixed(1)+"%";
   }
   
   HM.raf=requestAnimationFrame(hmTick);
 }
-const hmPush=dv=>{if(!HM.on||!HM.dealt) return; hmMeasure(); HM.tx=Math.min(HM.max,Math.max(0,HM.tx+dv));};
-addEventListener("wheel",e=>{if(!HM.on) return; if(e.target.closest&&e.target.closest(".peek,.menu-overlay,.nav")) return; e.preventDefault(); const dv=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX)*(e.deltaMode===1?32:1); hmPush(dv*1.15);},{passive:false});
+function hmDealNow(){const hm=document.getElementById("hm"); if(!hm||HM.dealt) return; clearTimeout(HM.timer); hm.classList.remove("is-greeting"); hm.classList.add("is-dealt"); HM.dealt=true; hmMeasure();}
+const hmPush=dv=>{if(!HM.on) return; if(!HM.dealt){hmDealNow(); return;} hmMeasure(); HM.tx=Math.min(HM.max,Math.max(0,HM.tx+dv));};
+function hmGo(i){const r=document.getElementById("deck"), st=document.getElementById("hm-stage"); if(!r||!st||!r.children.length) return; hmMeasure(); HM.idx=Math.max(0,Math.min(r.children.length-1,i)); const c=r.children[HM.idx]; HM.tx=Math.min(HM.max,Math.max(0,c.offsetLeft+c.offsetWidth/2-st.clientWidth/2));}
+let hmAcc=0, hmLock=0;
+addEventListener("wheel",e=>{if(!HM.on) return; if(e.target.closest&&e.target.closest(".peek,.menu-overlay,.nav")) return; e.preventDefault(); if(!HM.dealt){hmDealNow(); return;} const dv=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX)*(e.deltaMode===1?32:e.deltaMode===2?400:1); const now=performance.now(); if(HM.idx==null) HM.idx=HM.best||0;
+  if(Math.abs(dv)>=50){hmAcc=0; hmGo(HM.idx+(dv>0?1:-1)); hmLock=now+90; return;}
+  hmAcc+=dv; if(Math.abs(hmAcc)>=45&&now>hmLock){hmGo(HM.idx+(hmAcc>0?1:-1)); hmAcc=0; hmLock=now+300;}},{passive:false});
 addEventListener("keydown",e=>{if(!HM.on||e.target.closest("input,textarea,select")) return; const step=(document.querySelector(".bw")?.getBoundingClientRect().width||300)+36;
-  if(["ArrowDown","ArrowRight","PageDown"," "].includes(e.key)){e.preventDefault(); hmPush(step);} else if(["ArrowUp","ArrowLeft","PageUp"].includes(e.key)){e.preventDefault(); hmPush(-step);} else if(e.key==="Home"){HM.tx=0;} else if(e.key==="End"){hmMeasure(); HM.tx=HM.max;}});
+  if(!HM.dealt){hmDealNow(); return;} if(HM.idx==null) HM.idx=HM.best||0; if(["ArrowDown","ArrowRight","PageDown"," "].includes(e.key)){e.preventDefault(); hmGo(HM.idx+1);} else if(["ArrowUp","ArrowLeft","PageUp"].includes(e.key)){e.preventDefault(); hmGo(HM.idx-1);} else if(e.key==="Home"){hmGo(0);} else if(e.key==="End"){hmGo(1e3);}});
 addEventListener("touchstart",e=>{if(!HM.on) return; const t=e.touches[0]; HM.drag={x:t.clientX,y:t.clientY}; HM.moved=0;},{passive:true});
 addEventListener("touchmove",e=>{if(!HM.on||!HM.drag) return; const t=e.touches[0], dx=HM.drag.x-t.clientX, dy=HM.drag.y-t.clientY; HM.drag={x:t.clientX,y:t.clientY}; HM.moved+=Math.abs(dx)+Math.abs(dy); e.preventDefault(); hmPush((Math.abs(dy)>Math.abs(dx)?dy:dx)*1.6);},{passive:false});
-addEventListener("touchend",()=>{HM.drag=null;},{passive:true});
+addEventListener("touchend",()=>{if(HM.on&&HM.drag&&HM.dealt) hmGo(HM.best||0); HM.drag=null;},{passive:true});
 document.addEventListener("click",e=>{if(HM.on&&HM.moved>12&&e.target.closest(".bw")){e.stopPropagation(); e.preventDefault(); HM.moved=0;}},true);
 addEventListener("resize",()=>{if(HM.on) hmMeasure();});
 
